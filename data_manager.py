@@ -101,14 +101,17 @@ class Song:
 class Playlist:
     """This class has-a collection of song objects as well as functions that help compute data of the playlist"""
     
-    def __init__(self, name: str, songs: Optional[List[Song]] = None):
+    def __init__(self, name: str, songs: Optional[list[Song]] = None):
         """Initializes a playlist object with a name and an empty list of songs"""
         self.name: str = name
-        self.songs: List[Song] = songs if songs is not None else []
+        self.songs: list[Song] = songs if songs is not None else []
     
-    def similarity(self, other: Playlist) -> float:
+    def similarity(self, other: 'Playlist') -> float:
         """Return a value between -1 and 1 indicating the similarity between two playlists."""
         # NOTE: this algorithm may not be the best way to calculate similarity, but should be decent 
+
+        if len(self.songs) == 0 or len(other.songs) == 0:
+            return -1
 
         mean_vector1 = [0] * 5
         mean_vector2 = [0] * 5
@@ -140,10 +143,10 @@ class Playlist:
 
 
 
-# data_manager = DataManager()
-# data_manager.load_data_raw('dataset.csv')
+data_manager = DataManager()
+data_manager.load_data_raw('dataset.csv')
 
 
-# playlist1 = Playlist()
-# playlist2 = Playlist()
-# print(playlist1.similarity(playlist2))
+playlist1 = Playlist('playlist1')
+playlist2 = Playlist('playlist1')
+print(playlist1.similarity(playlist2))
