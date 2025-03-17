@@ -110,8 +110,8 @@ class Playlist:
         """Return a value between -1 and 1 indicating the similarity between two playlists."""
         # NOTE: this algorithm may not be the best way to calculate similarity, but should be decent 
 
-        mean_vector1 = [0, 0, 0, 0, 0]
-        mean_vector2 = [0, 0, 0, 0, 0]
+        mean_vector1 = [0] * 5
+        mean_vector2 = [0] * 5
 
         for song in self.songs:
             mean_vector1[0] += song.is_explicit
@@ -132,10 +132,10 @@ class Playlist:
         mean_vector2 = [x / len(other.songs) for x in mean_vector2]
 
         # Cosine(theta) = (A . B) / (|A| * |B|)
-        dot_product = sum([mean_vector1[i] * mean_vector2[i] for i in range(5)])
-        magnitude1 = sum([x**2 for x in mean_vector1]) ** 0.5
-        magnitude2 = sum([x**2 for x in mean_vector2]) ** 0.5
-        return dot_product / (magnitude1 * magnitude2)
+        dot_product = sum(mean_vector1[i] * mean_vector2[i] for i in range(5))
+        norm1 = sum(x**2 for x in mean_vector1) ** 0.5
+        norm2 = sum(x**2 for x in mean_vector2) ** 0.5
+        return dot_product / (norm1 * norm2)
 
 
 
