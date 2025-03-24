@@ -14,34 +14,33 @@ class Song:
     - artists: a list of artists who made the song
     - album_name: the name of the album the song belongs to
     - track_name: the name of the song
-    - track_genre: the genre of the song
-    - duration_ms: the length of the song in seconds
     - popularity: score of the song's popularity
-    - key: key of the song in pitch class notation
-    - mode: modality (major or minor) of the song
-    - tempo: tempo of the song in BPM
+    - duration_ms: the length of the song in seconds
     - is_explicit: whether the song contains explicit content
-    - is_energetic: whether the song is energetic
-    - is_instrumental: whether the song is instrumental
-    - is_acoustic: whether the song is acoustic
-    - is_happy: whether the song is happy
+    - energy: energy of the song
+    - mode: modality (major or minor) of the song
+    - acousticness: confidence of the song being acoustic
+    - instrumentalness: confidence of the song being instrumental
+    - valence: the positiveness of the song
+    - tempo: tempo of the song in BPM
+    - track_genre: the genre of the song
     """
 
     track_id: str
     artists: list[str]
     album_name: str
     track_name: str
-    track_genre: str
-    duration_ms: int
     popularity: int
-    key: int
-    mode: int
-    tempo: float
+    duration_ms: int
     is_explicit: bool
-    is_energetic: bool
-    is_instrumental: bool
-    is_acoustic: bool
-    is_happy: bool
+    energy: float
+    mode: int
+    speechiness: float
+    acousticness: float
+    instrumentalness: float
+    valence: float
+    tempo: float
+    track_genre: str
 
     def __str__(self):
         """Return a string representation of the song"""
@@ -87,38 +86,37 @@ class Playlist:
         if len(self._songs) == 0 or len(other._songs) == 0:
             return -1
 
-        mean_vector1 = [0] * 8
-        mean_vector2 = [0] * 8
+        num_features = 7
+        mean_vector1 = [0] * num_features
+        mean_vector2 = [0] * num_features
 
         for song in self._songs:
 
             mean_vector1[0] += song.is_explicit
-            mean_vector1[1] += song.is_energetic
-            mean_vector1[2] += song.is_instrumental
-            mean_vector1[3] += song.is_acoustic
-            mean_vector1[4] += song.is_happy
+            mean_vector1[1] += song.energy
+            mean_vector1[2] += song.instrumentalness
+            mean_vector1[3] += song.acousticness
+            mean_vector1[4] += song.valence
             mean_vector1[5] += song.mode
 
             mean_vector1[6] += song.tempo / 200
-            mean_vector1[7] += song.key / 11
         
         mean_vector1 = [x / len(self._songs) for x in mean_vector1]
 
         for song in other._songs:
             mean_vector2[0] += song.is_explicit
-            mean_vector2[1] += song.is_energetic
-            mean_vector2[2] += song.is_instrumental
-            mean_vector2[3] += song.is_acoustic
-            mean_vector2[4] += song.is_happy
+            mean_vector2[1] += song.energy
+            mean_vector2[2] += song.instrumentalness
+            mean_vector2[3] += song.acousticness
+            mean_vector2[4] += song.valence
             mean_vector2[5] += song.mode
 
             mean_vector2[6] += song.tempo / 200
-            mean_vector2[7] += song.key / 11
         
         mean_vector2 = [x / len(other._songs) for x in mean_vector2]
 
         # Cosine(theta) = (A . B) / (|A| * |B|)
-        dot_product = sum(mean_vector1[i] * mean_vector2[i] for i in range(8))
+        dot_product = sum(mean_vector1[i] * mean_vector2[i] for i in range(num_features))
         norm1 = sum(x**2 for x in mean_vector1) ** 0.5
         norm2 = sum(x**2 for x in mean_vector2) ** 0.5
         return dot_product / (norm1 * norm2)
@@ -146,23 +144,35 @@ class DataManager:
             artists = row['artists'].split(';')
             album_name = row['album_name']
             track_name = row['track_name']
-            track_genre = row['track_genre']
-            duration_ms = int(row['duration_ms'])
             popularity = int(row['popularity'])
-            key = int(row['key'])
+            duration_ms = int(row['duration_ms'])
+            is_explicit = row['explicit'] == 'True'
+            energy = float(row['energy'])
             mode = int(row['mode'])
+            speechiness = float(row['speechiness'])
+            acousticness = float(row['acousticness'])
+            instrumentalness = float(row['instrumentalness'])
+            valence = float(row['valence'])
             tempo = float(row['tempo'])
+            track_genre = row['track_genre']
 
-            is_explicit = True if row['explicit'] == 'True' else False
-            # NOTE: some of these cutoff values may need to be adjusted
-            is_energetic = float(row['energy']) > 0.5
-            is_instrumental = float(row['instrumentalness']) > 0.5
-            is_acoustic = float(row['acousticness']) > 0.5
-            is_happy = float(row['valence']) > 0.5
-
-            song = Song(track_id, artists, album_name, track_name, track_genre,
-                        duration_ms, popularity, key, mode, tempo,
-                        is_explicit, is_energetic, is_instrumental, is_acoustic, is_happy)
+            song = Song(
+                track_id=track_id,
+                artists=artists,
+                album_name=album_name,
+                track_name=track_name,
+                popularity=popularity,
+                duration_ms=duration_ms,
+                is_explicit=is_explicit,
+                energy=energy,
+                mode=mode,
+                speechiness=speechiness,
+                acousticness=acousticness,
+                instrumentalness=instrumentalness,
+                valence=valence,
+                tempo=tempo,
+                track_genre=track_genre
+            )
 
             self._songs[track_id] = song
 
@@ -173,39 +183,41 @@ class DataManager:
         return self._songs[track_id]
     
 
-data_manager = DataManager()
-data_manager.load_data_raw('dataset.csv')
-data_manager.parse_data()
+# TEST STUFF
+if __name__ == '__main__':
+    data_manager = DataManager()
+    data_manager.load_data_raw('dataset.csv')
+    data_manager.parse_data()
 
 
-# kpop
-playlist1 = Playlist('playlist1')
-playlist1.add_song(data_manager.get_song_by_id('3hkC9EHFZNQPXrtl8WPHnX'))
-playlist1.add_song(data_manager.get_song_by_id('45OX2jjEw1l7lOFJfDP9fv'))
-playlist1.add_song(data_manager.get_song_by_id('5aucVLKiumD89mxVCB4zvS'))
-playlist1.add_song(data_manager.get_song_by_id('1R0hxCA5R7z5TiaXBZR7Mf'))
+    # kpop
+    playlist1 = Playlist('playlist1')
+    playlist1.add_song(data_manager.get_song_by_id('3hkC9EHFZNQPXrtl8WPHnX'))
+    playlist1.add_song(data_manager.get_song_by_id('45OX2jjEw1l7lOFJfDP9fv'))
+    playlist1.add_song(data_manager.get_song_by_id('5aucVLKiumD89mxVCB4zvS'))
+    playlist1.add_song(data_manager.get_song_by_id('1R0hxCA5R7z5TiaXBZR7Mf'))
 
-# kpop2
-playlist2 = Playlist('playlist2')
-playlist2.add_song(data_manager.get_song_by_id('4a9tbd947vo9K8Vti9JwcI'))
-playlist2.add_song(data_manager.get_song_by_id('6cvGDClEIomp5CfKY3pQuZ'))
-playlist2.add_song(data_manager.get_song_by_id('1KNi6PNEbQYnkxmqeschok'))
+    # kpop2
+    playlist2 = Playlist('playlist2')
+    playlist2.add_song(data_manager.get_song_by_id('4a9tbd947vo9K8Vti9JwcI'))
+    playlist2.add_song(data_manager.get_song_by_id('6cvGDClEIomp5CfKY3pQuZ'))
+    playlist2.add_song(data_manager.get_song_by_id('1KNi6PNEbQYnkxmqeschok'))
 
-# eminem
-playlist3 = Playlist('playlist3')
-playlist3.add_song(data_manager.get_song_by_id('5W8HXMOMLtXLz0RGKUtnlZ'))
-playlist3.add_song(data_manager.get_song_by_id('3r9m79pHykbs4FrCXlq1oO'))
-playlist3.add_song(data_manager.get_song_by_id('1FJYqedfrSGitGHMvwRGBg'))
+    # eminem
+    playlist3 = Playlist('playlist3')
+    playlist3.add_song(data_manager.get_song_by_id('5W8HXMOMLtXLz0RGKUtnlZ'))
+    playlist3.add_song(data_manager.get_song_by_id('3r9m79pHykbs4FrCXlq1oO'))
+    playlist3.add_song(data_manager.get_song_by_id('1FJYqedfrSGitGHMvwRGBg'))
 
-# juice wrld
-playlist4 = Playlist('playlist4')
-playlist4.add_song(data_manager.get_song_by_id('6XO8RlYuJCiI0v3IA48FeJ'))
+    # juice wrld
+    playlist4 = Playlist('playlist4')
+    playlist4.add_song(data_manager.get_song_by_id('6XO8RlYuJCiI0v3IA48FeJ'))
 
-print(playlist1.cosine_similarity(playlist2)) # 0.9625 kpop to kpop
-print(playlist1.cosine_similarity(playlist3)) # 0.7294 kpop to eminem
-print(playlist1.cosine_similarity(playlist4)) # 0.6992 kpop to juice wrld
-print(playlist3.cosine_similarity(playlist4)) # 0.9835 eminem to juice wrld
+    print(playlist1.cosine_similarity(playlist2)) # 0.97
+    print(playlist1.cosine_similarity(playlist3)) # 0.60
+    print(playlist1.cosine_similarity(playlist4)) # 0.50
+    print(playlist3.cosine_similarity(playlist4)) # 0.96
 
-print(playlist2.convert_to_string())
+    print(playlist2.convert_to_string())
 
-#['acoustic', 'afrobeat', 'alt-rock', 'alternative', 'ambient', 'anime', 'black-metal', 'bluegrass', 'blues', 'brazil', 'breakbeat', 'british', 'cantopop', 'chicago-house', 'children', 'chill', 'classical', 'club', 'comedy', 'country', 'dance', 'dancehall', 'death-metal', 'deep-house', 'detroit-techno', 'disco', 'disney', 'drum-and-bass', 'dub', 'dubstep', 'edm', 'electro', 'electronic', 'emo', 'folk', 'forro', 'french', 'funk', 'garage', 'german', 'gospel', 'goth', 'grindcore', 'groove', 'grunge', 'guitar', 'happy', 'hard-rock', 'hardcore', 'hardstyle', 'heavy-metal', 'hip-hop', 'honky-tonk', 'house', 'idm', 'indian', 'indie-pop', 'indie', 'industrial', 'iranian', 'j-dance', 'j-idol', 'j-pop', 'j-rock', 'jazz', 'k-pop', 'kids', 'latin', 'latino', 'malay', 'mandopop', 'metal', 'metalcore', 'minimal-techno', 'mpb', 'new-age', 'opera', 'pagode', 'party', 'piano', 'pop-film', 'pop', 'power-pop', 'progressive-house', 'psych-rock', 'punk-rock', 'punk', 'r-n-b', 'reggae', 'reggaeton', 'rock-n-roll', 'rock', 'rockabilly', 'romance', 'sad', 'salsa', 'samba', 'sertanejo', 'show-tunes', 'singer-songwriter', 'ska', 'sleep', 'songwriter', 'soul', 'spanish', 'study', 'swedish', 'synth-pop', 'tango', 'techno', 'trance', 'trip-hop', 'turkish', 'world-music']
+    #['acoustic', 'afrobeat', 'alt-rock', 'alternative', 'ambient', 'anime', 'black-metal', 'bluegrass', 'blues', 'brazil', 'breakbeat', 'british', 'cantopop', 'chicago-house', 'children', 'chill', 'classical', 'club', 'comedy', 'country', 'dance', 'dancehall', 'death-metal', 'deep-house', 'detroit-techno', 'disco', 'disney', 'drum-and-bass', 'dub', 'dubstep', 'edm', 'electro', 'electronic', 'emo', 'folk', 'forro', 'french', 'funk', 'garage', 'german', 'gospel', 'goth', 'grindcore', 'groove', 'grunge', 'guitar', 'happy', 'hard-rock', 'hardcore', 'hardstyle', 'heavy-metal', 'hip-hop', 'honky-tonk', 'house', 'idm', 'indian', 'indie-pop', 'indie', 'industrial', 'iranian', 'j-dance', 'j-idol', 'j-pop', 'j-rock', 'jazz', 'k-pop', 'kids', 'latin', 'latino', 'malay', 'mandopop', 'metal', 'metalcore', 'minimal-techno', 'mpb', 'new-age', 'opera', 'pagode', 'party', 'piano', 'pop-film', 'pop', 'power-pop', 'progressive-house', 'psych-rock', 'punk-rock', 'punk', 'r-n-b', 'reggae', 'reggaeton', 'rock-n-roll', 'rock', 'rockabilly', 'romance', 'sad', 'salsa', 'samba', 'sertanejo', 'show-tunes', 'singer-songwriter', 'ska', 'sleep', 'songwriter', 'soul', 'spanish', 'study', 'swedish', 'synth-pop', 'tango', 'techno', 'trance', 'trip-hop', 'turkish', 'world-music']

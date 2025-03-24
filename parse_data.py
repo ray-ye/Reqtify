@@ -10,11 +10,11 @@ with open('dataset.csv', 'r', encoding="utf-8") as file:
             'is_instrumental': float(row['instrumentalness']) > 0.5,
             'is_acoustic': float(row['acousticness']) > 0.5,
             'is_happy': float(row['valence']) > 0.5,
-            'is_loud': float(row['loudness']) > -7,
-            'is_major': int(row['mode']) == 1,
-            'is_danceable': float(row['danceability']) > 0.6,
-            'is_live': float(row['liveness']) > 0.8,
-            'is_fast': float(row['tempo']) > 120,
+            'is_loud': float(row['loudness']) > -7,  # -7 is the median value
+            'is_major': int(row['mode']) == 1, 
+            'is_danceable': float(row['danceability']) > 0.6, # 0.6 is roughly the median value
+            'is_live': float(row['liveness']) > 0.8,  # 0.8 is described to be high probability of being live
+            'is_fast': float(row['tempo']) > 120,  # roughly the median value
         }
         rows.append(row)
 
