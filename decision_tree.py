@@ -6,16 +6,10 @@ class DecisionTree:
     _root: Optional[Any]
     _subtrees: list['DecisionTree']
 
-    def __init__(self, root: Optional[Any], subtrees: list['DecisionTree']) -> None:
-        """Initialize a new Tree with the given root value and subtrees.
-
-        If root is None, the tree is empty.
-
-        Preconditions:
-            - root is not none or subtrees == []
-        """
+    def __init__(self, root: Any, subtrees: list) -> None:
+        """Initialize a new decision tree."""
         self._root = root
-        self._subtrees = subtrees
+        self._subtrees = []
 
     def is_empty(self) -> bool:
         """Return whether this tree is empty.
@@ -93,18 +87,20 @@ class DecisionTree:
 
         return [str(subtree._root) for subtree in cursor._subtrees]
 
-    def build_tree(self, data: list[list]) -> None:
+    def build_tree(self, file_path: str) -> None:
         """Build a decision tree from the given data."""
+
+        with open(file_path, 'r') as file:
+            reader = csv.reader(file)
+            data = [list(map(lambda x: x=='True', row[1:])) + [row[0]] for row in reader]
+
         for row in data:
             self.insert_sequence(row)
     
 # test the tree
 if __name__ == '__main__':
     tree = DecisionTree(None, [])
-    with open('songs.csv', 'r') as file:
-        reader = csv.reader(file)
-        data = [list(map(lambda x: x=='True', row[1:])) + [row[0]] for row in reader]
-    tree.build_tree(data)
+    tree.build_tree('songs.csv')
     print(len(tree.children([True,False,False,False,True,True,False,True,False,False])))
 
     for i in tree.children([True,False,False,False,True,True,False,True,False,False]):
