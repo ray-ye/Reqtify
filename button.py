@@ -1,0 +1,90 @@
+import pygame
+from typing import Optional
+
+def hover_effect(position, buttons):
+    """Check if user is hovering over button and change the button accordingly."""
+
+    if any(button.check_hover(position) for button in buttons):
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+    else:
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+
+
+class Button():
+    def __init__(self, image, pos, button_size,
+                 text_input: Optional[str] = None,
+                 font: Optional[str] = None,
+                 font_size: Optional[int] = None,
+                 font_colour: Optional[tuple] = None,
+                 button_colour: Optional[tuple] = None,
+                 radius: Optional[int] = None
+                 ):
+
+        # -----------initiating attributes-----------
+        self.x_pos = pos[0]
+        self.y_pos = pos[1]
+        self.image = image
+        self.text_input = text_input
+        self.font_size = font_size
+        if font:
+            self.font = pygame.font.SysFont(font, self.font_size, bold=True)
+        self.width = button_size[0]
+        self.height = button_size[1]
+        self.font_colour = font_colour
+        self.button_colour = button_colour
+        self.radius = radius
+
+        # ----------initiating shapes and surfaces-----------
+        if not image:
+            # text
+            self.text = self.font.render(self.text_input, True, self.font_colour)
+            self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
+
+            # rect
+            self.rect = pygame.Rect(0, 0, button_size[0], button_size[1])
+            self.rect.center = (self.x_pos, self.y_pos)
+
+        else:
+            self.image = pygame.image.load(image).convert_alpha()
+            self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
+            self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
+
+    def draw(self, screen):
+        """Draws the button onto screen"""
+        if self.image:
+            screen.blit(self.image, self.rect)
+
+        else:
+            pygame.draw.rect(screen, self.button_colour, self.rect, border_radius=self.radius)
+            screen.blit(self.text, self.text_rect)
+
+    def check_hover(self, position) -> bool:
+        """Checks if button has been clicked based on the current position of the mouse."""
+
+        if (
+                position[0] in range(self.rect.left, self.rect.right) and
+                position[1] in range(self.rect.top, self.rect.bottom)
+        ):
+
+            return True
+        return False
+
+    def set_pos(self, x, y):
+        self.x_pos = x
+        self.y_pos = y
+
+        self.text = self.font.render(self.text_input, True, self.font_colour)
+        self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
+
+        self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.rect.center = (self.x_pos, self.y_pos)
+
+    def get_pos(self):
+        return self.x_pos, self.y_pos
+
+    def get_dimensions(self) -> tuple:
+        return self.width, self.height
+
+    def change_text(self, new_text):
+        self.text = self.font.render(new_text, True, self.font_colour)
+        self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))

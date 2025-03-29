@@ -1,0 +1,35 @@
+{
+     "text_entry_line":
+     {
+         "colours":
+         {
+             "dark_bg": "#D9D9D9",
+             "selected_bg": "#70bf77",
+             "normal_text": "#1e1e1e",
+             "selected_text": "#FFFFFF",
+             "normal_border": "#D9D9D9",
+             "text_cursor": "#1e1e1e"
+         },
+         "font":
+         {
+             "name": "arial",
+             "size": "17",
+             "bold": true,
+             "italic": "1",
+             "bold_resource": {
+                "package": "data.fonts",
+                "resource": "arial-bold.ttf"
+            }
+
+
+         },
+         "misc":
+         {
+             "shape": "rounded_rectangle",
+             "shape_corner_radius": 20,
+             "border_width": "2",
+             "shadow_width": "2",
+             "padding": "6,4"
+         }
+     }
+ }

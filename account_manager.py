@@ -2,7 +2,6 @@
 from typing import Optional
 import json
 from dataclasses import dataclass
-from helper import Helper
 
 
 @dataclass
@@ -49,8 +48,17 @@ class Accounts:
         else:
             return self._accounts[name]
 
+    def get_all(self) -> set:
+        """Return a set of all usernames"""
+        return set(self._accounts.keys())
+
+    def exist(self, username) -> bool:
+        """Check if user exists via their username"""
+        return username in self.get_all()
+
     def login(self, name: str, password: str) -> bool:
         """Check if name and passsword entered by user is the same as account info in database"""
+
         if name in self._accounts and password == self._accounts[name].password:
             return True
         else:
@@ -69,60 +77,47 @@ class Accounts:
         with open("account_data.json", "w") as f:
             json.dump(account_data, f, indent=2)
 
-    def handle_login(self) -> User | None:
+    def handle_login(self, username) -> User | None:
         """A function to help manage the prompt message for user account info，
         Return user oject containing user info"""
-        login = False
-        user = None
 
-        if not login:
-            choice = input("Would you like to login or register [login/register]: ").strip().lower()
+        return self.get_account()[username]
 
-            while choice not in ["login", "register"]:
-                print(choice, "is not a valid input. \n")
-                choice = input("Try again [login/register]: ")
+    def error(self, username, password, re_password, get_message: Optional[bool] = None) -> bool | str:
+        """Return whether error has occured, and if get_message, return the error message."""
 
-            if choice == "login":
+        error_message = ""
+        error = False
 
-                print("Please enter your username and password [case sensitive]")
+        if any(not item for item in [username, password, re_password]):
+            error = True
+            error_message = "Please fill out all boxes."
 
-                username = input("Username: ").strip()
-                password1 = input("Password: ").strip()
+        elif len(username) < 2 or len(username) > 8:
+            error = True
+            error_message = "Username should be 2 to 8 characters long."
 
-                while not self.login(username, password1):
+        elif len(password) < 5 or len(password) > 8:
+            error = True
+            error_message = "Password should be 5 to 8 characters long."
 
-                    print("Username or password was incorrect, please try again.")
-                    username = input("Username: ").strip()
-                    password1 = input("Password: ").strip()
+        elif any(" " in x for x in [username, password, re_password]):
+            error = True
+            error_message = "Empty spaces are not allowed in username or password."
 
-                user = self.get_account()[username]
+        elif password != re_password:
+            error = True
+            error_message = "Passwords do not match."
 
-                login = True
+        elif self.exist(username):
+            error = True
+            error_message = "Username is taken."
 
-            elif choice == "register":
-                print("Please enter your username and password [case sensitive]")
-                username = input("Username: ").strip()
+        if get_message:
+            return error_message
 
-                while username in self.get_account():
-                    print("Username taken, please try again.")
-                    username = input("Username: ").strip()
-
-                password1 = input("Password: ").strip()
-                password2 = input("Enter password again: ").strip()
-
-                while password1 != password2:
-
-                    print("Passwords do not match, please try again.")
-
-                    password1 = input("Password: ").strip()
-                    password2 = input("Enter password again: ").strip()
-
-                self.register(username, password1)
-                user = self.get_account()[username]
-
-                login = True
-
-        return user
+        else:
+            return error
 
 
 if __name__ == "__main__":

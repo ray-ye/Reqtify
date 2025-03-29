@@ -4,5 +4,6 @@
 class Settings:
     """A settings data class storing all settings attributes for the app"""
 
-    SCREEN_WIDTH = 800
+    SCREEN_WIDTH = 650
     SCREEN_HEIGHT = 800
+    BACKGROUND_COLOUR = (33, 33, 33)

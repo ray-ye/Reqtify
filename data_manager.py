@@ -4,7 +4,7 @@ from csv import DictReader
 from typing import Optional
 from dataclasses import dataclass
 
-       
+
 @dataclass
 class Song:
     """A data class that contains data of a song in our database
@@ -48,8 +48,8 @@ class Song:
 
 
 class Playlist:
-    """This class has-a collection of song objects as well as functions that help compute data of the playlist"""
-    
+    """This class has-a collection of song objects as well as  functions that help compute data of the playlist"""
+
     def __init__(self, name: str, songs: Optional[list[Song]] = None):
         """Initializes a playlist object with a name and an empty list of songs"""
         self.name: str = name
@@ -58,11 +58,11 @@ class Playlist:
     def __len__(self) -> int:
         """Return the number of songs in the playlist"""
         return len(self._songs)
-    
+
     def add_song(self, song: Song) -> None:
         """Add a song to the playlist"""
         self._songs.append(song)
-    
+
     def remove_song(self, song: Song) -> None:
         """Remove a song from the playlist"""
         self._songs.remove(song)
@@ -70,7 +70,7 @@ class Playlist:
     def append_playlist(self, other: 'Playlist') -> None:
         """Append the songs from another playlist to this playlist"""
         self._songs.extend(other._songs)
-    
+
     def convert_to_string(self) -> str:
         """
         Return a string representation of the playlist specifically intended to be copy-pasted into a spotify playlist.
@@ -100,7 +100,7 @@ class Playlist:
             mean_vector1[5] += song.mode
 
             mean_vector1[6] += song.tempo / 200
-        
+
         mean_vector1 = [x / len(self._songs) for x in mean_vector1]
 
         for song in other._songs:
@@ -112,7 +112,7 @@ class Playlist:
             mean_vector2[5] += song.mode
 
             mean_vector2[6] += song.tempo / 200
-        
+
         mean_vector2 = [x / len(other._songs) for x in mean_vector2]
 
         # Cosine(theta) = (A . B) / (|A| * |B|)
@@ -124,7 +124,7 @@ class Playlist:
 
 class DataManager:
     """Class to load, parse, and manage the song data"""
-    
+
     def __init__(self):
         """"""
         self._song_data_raw: list[dict[str, str]] = []
@@ -181,7 +181,7 @@ class DataManager:
         if track_id not in self._songs:
             return None
         return self._songs[track_id]
-    
+
 
 # TEST STUFF
 if __name__ == '__main__':
