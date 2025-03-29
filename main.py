@@ -6,6 +6,7 @@ import sys
 from typing import Optional
 
 from account_manager import Accounts, User
+
 from settings import Settings
 from button import Button, hover_effect
 from textbox import TextBox

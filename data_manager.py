@@ -80,55 +80,118 @@ class Playlist:
         for song in self._songs:
             res.append(f'spotify:track:{song.track_id}')
         return '\n'.join(res)
-
-    def cosine_similarity(self, other: 'Playlist') -> float:
-        """Return a value between -1 and 1 indicating the similarity between two playlists."""
+    
+    def taste_match(self, other: 'Playlist') -> float:
+        """Return a percentage indicating how similar the taste in music is between two playlists"""
         if len(self._songs) == 0 or len(other._songs) == 0:
             return -1
 
+        vector1 = self._vectorize_playlist()
+        vector2 = other._vectorize_playlist()
+
+        # Cosine similarity here returns a value > 0 since all features are positive
+        cosine_similarity = self._cosine_similarity(vector1, vector2)
+        return int(cosine_similarity * 100)
+
+    def recommend_songs(self, song_manager: 'SongManager', limit: int) -> list[Song]:
+        """Return a list of recommended songs based on the playlist"""
+        if len(self._songs) == 0:
+            return []
+
+        playlist_vector = self._vectorize_playlist()
+        recommended_songs = []
+
+        for song in song_manager._songs.values():
+            song_vector = self._vectorize_song(song)
+            similarity = self._cosine_similarity(playlist_vector, song_vector)
+            recommended_songs.append((song, similarity))
+        
+        # Sort by similarity first, then by popularity
+        recommended_songs.sort(key=lambda x: (x[1], x[0].popularity), reverse=True)
+        return [x[0] for x in recommended_songs[:limit]]
+
+    def playlist_profile(self):
+        """Return a dictionary with the 'profile' of the playlist, containing the top genre, average moods, etc."""
+        top_genre = self._top_genre()
+        avg_energy, _, _, avg_acousticness, avg_instrumentalness, avg_valence, _ = self._vectorize_playlist()
+
+        res = {
+            'top_genre': top_genre,
+            'avg_energy': avg_energy,
+            'avg_acousticness': avg_acousticness,
+            'avg_instrumentalness': avg_instrumentalness,
+            'avg_happiness': avg_valence
+        }
+        return res
+    
+    def _top_genre(self) -> str:
+        """Return the top genre in the playlist"""
+        genre_count = {}
+        for song in self._songs:
+            genre = song.track_genre
+            if genre not in genre_count:
+                genre_count[genre] = 0
+            genre_count[genre] += 1
+        
+        top_genre = None
+        max_count = 0
+        for genre, count in genre_count.items():
+            if count > max_count:
+                top_genre = genre
+                max_count = count
+        
+        return genre
+
+    def _vectorize_song(self, song: Song) -> list[float]:
+        """Return a list of the features of the song, normalized to a value roughly between 0 and 1"""
+        return [song.energy, song.mode, song.speechiness, song.acousticness,
+                song.instrumentalness, song.valence, song.tempo / 120
+        ]
+
+    def _vectorize_playlist(self) -> list[float]:
+        """
+        Return a list of the mean values of the features of the songs in the playlist
+        Preconditions:
+            - len(self._songs) > 0
+        """
         num_features = 7
-        mean_vector1 = [0] * num_features
-        mean_vector2 = [0] * num_features
+        playlist_vector = [0] * num_features
 
         for song in self._songs:
+            song_vector = self._vectorize_song(song)
+            for i in range(num_features):
+                playlist_vector[i] += song_vector[i]
+        
+        return [x / len(self._songs) for x in playlist_vector]
 
-            mean_vector1[0] += song.is_explicit
-            mean_vector1[1] += song.energy
-            mean_vector1[2] += song.instrumentalness
-            mean_vector1[3] += song.acousticness
-            mean_vector1[4] += song.valence
-            mean_vector1[5] += song.mode
+    def _cosine_similarity(self, vector1: list[float], vector2: list[float]) -> float:
+        """
+        Return a value between -1 and 1 indicating the similarity between two vectors.
+        Preconditions:
+            - len(vector1) == len(vector2)
+            - len(vector1) > 0
+        """
+        dot_product = sum(vector1[i] * vector2[i] for i in range(len(vector1)))
+        norm1 = sum(x**2 for x in vector1) ** 0.5
+        norm2 = sum(x**2 for x in vector2) ** 0.5
 
-            mean_vector1[6] += song.tempo / 200
+        if norm1 == 0 or norm2 == 0:
+            return 0
 
-        mean_vector1 = [x / len(self._songs) for x in mean_vector1]
-
-        for song in other._songs:
-            mean_vector2[0] += song.is_explicit
-            mean_vector2[1] += song.energy
-            mean_vector2[2] += song.instrumentalness
-            mean_vector2[3] += song.acousticness
-            mean_vector2[4] += song.valence
-            mean_vector2[5] += song.mode
-
-            mean_vector2[6] += song.tempo / 200
-
-        mean_vector2 = [x / len(other._songs) for x in mean_vector2]
-
-        # Cosine(theta) = (A . B) / (|A| * |B|)
-        dot_product = sum(mean_vector1[i] * mean_vector2[i] for i in range(num_features))
-        norm1 = sum(x**2 for x in mean_vector1) ** 0.5
-        norm2 = sum(x**2 for x in mean_vector2) ** 0.5
         return dot_product / (norm1 * norm2)
 
 
-class DataManager:
+class SongManager:
     """Class to load, parse, and manage the song data"""
-
-    def __init__(self):
+   
+    def __init__(self, file_path: Optional[str] = None):
         """"""
         self._song_data_raw: list[dict[str, str]] = []
         self._songs: dict[str, Song] = {}
+        
+        if file_path is not None:
+            self.load_data_raw(file_path)
+            self.parse_data()
 
     def load_data_raw(self, file_path: str):
         """Loads the raw song data from a CSV file into the _song_data_raw attribute"""
@@ -185,39 +248,13 @@ class DataManager:
 
 # TEST STUFF
 if __name__ == '__main__':
-    data_manager = DataManager()
-    data_manager.load_data_raw('dataset.csv')
-    data_manager.parse_data()
-
-
-    # kpop
+    sm = SongManager()
+    sm.load_data_raw('dataset.csv')
+    sm.parse_data()
+    
     playlist1 = Playlist('playlist1')
-    playlist1.add_song(data_manager.get_song_by_id('3hkC9EHFZNQPXrtl8WPHnX'))
-    playlist1.add_song(data_manager.get_song_by_id('45OX2jjEw1l7lOFJfDP9fv'))
-    playlist1.add_song(data_manager.get_song_by_id('5aucVLKiumD89mxVCB4zvS'))
-    playlist1.add_song(data_manager.get_song_by_id('1R0hxCA5R7z5TiaXBZR7Mf'))
-
-    # kpop2
+    playlist1.add_song(sm.get_song_by_id('5SuOikwiRyPMVoIQDJUgSV'))
+    playlist1.add_song(sm.get_song_by_id('4qPNDBW1i3p13qLCt0Ki3A'))
+    playlist1.add_song(sm.get_song_by_id('4yzs6Ba0GQH55Zo66Q51PS'))
+    # print(playlist1.recommend_songs(sm, 5))
     playlist2 = Playlist('playlist2')
-    playlist2.add_song(data_manager.get_song_by_id('4a9tbd947vo9K8Vti9JwcI'))
-    playlist2.add_song(data_manager.get_song_by_id('6cvGDClEIomp5CfKY3pQuZ'))
-    playlist2.add_song(data_manager.get_song_by_id('1KNi6PNEbQYnkxmqeschok'))
-
-    # eminem
-    playlist3 = Playlist('playlist3')
-    playlist3.add_song(data_manager.get_song_by_id('5W8HXMOMLtXLz0RGKUtnlZ'))
-    playlist3.add_song(data_manager.get_song_by_id('3r9m79pHykbs4FrCXlq1oO'))
-    playlist3.add_song(data_manager.get_song_by_id('1FJYqedfrSGitGHMvwRGBg'))
-
-    # juice wrld
-    playlist4 = Playlist('playlist4')
-    playlist4.add_song(data_manager.get_song_by_id('6XO8RlYuJCiI0v3IA48FeJ'))
-
-    print(playlist1.cosine_similarity(playlist2)) # 0.97
-    print(playlist1.cosine_similarity(playlist3)) # 0.60
-    print(playlist1.cosine_similarity(playlist4)) # 0.50
-    print(playlist3.cosine_similarity(playlist4)) # 0.96
-
-    print(playlist2.convert_to_string())
-
-    #['acoustic', 'afrobeat', 'alt-rock', 'alternative', 'ambient', 'anime', 'black-metal', 'bluegrass', 'blues', 'brazil', 'breakbeat', 'british', 'cantopop', 'chicago-house', 'children', 'chill', 'classical', 'club', 'comedy', 'country', 'dance', 'dancehall', 'death-metal', 'deep-house', 'detroit-techno', 'disco', 'disney', 'drum-and-bass', 'dub', 'dubstep', 'edm', 'electro', 'electronic', 'emo', 'folk', 'forro', 'french', 'funk', 'garage', 'german', 'gospel', 'goth', 'grindcore', 'groove', 'grunge', 'guitar', 'happy', 'hard-rock', 'hardcore', 'hardstyle', 'heavy-metal', 'hip-hop', 'honky-tonk', 'house', 'idm', 'indian', 'indie-pop', 'indie', 'industrial', 'iranian', 'j-dance', 'j-idol', 'j-pop', 'j-rock', 'jazz', 'k-pop', 'kids', 'latin', 'latino', 'malay', 'mandopop', 'metal', 'metalcore', 'minimal-techno', 'mpb', 'new-age', 'opera', 'pagode', 'party', 'piano', 'pop-film', 'pop', 'power-pop', 'progressive-house', 'psych-rock', 'punk-rock', 'punk', 'r-n-b', 'reggae', 'reggaeton', 'rock-n-roll', 'rock', 'rockabilly', 'romance', 'sad', 'salsa', 'samba', 'sertanejo', 'show-tunes', 'singer-songwriter', 'ska', 'sleep', 'songwriter', 'soul', 'spanish', 'study', 'swedish', 'synth-pop', 'tango', 'techno', 'trance', 'trip-hop', 'turkish', 'world-music']
