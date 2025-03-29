@@ -1,5 +1,8 @@
 {
   "init": {
     "password": "init"
+  },
+  "test1": {
+    "password": "12345"
   }
 }

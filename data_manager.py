@@ -48,8 +48,8 @@ class Song:
 
 
 class Playlist:
-    """This class has-a collection of song objects as well as functions that help compute data of the playlist"""
-    
+    """This class has-a collection of song objects as well as  functions that help compute data of the playlist"""
+
     def __init__(self, name: str, songs: Optional[list[Song]] = None):
         """Initializes a playlist object with a name and an empty list of songs"""
         self.name: str = name
@@ -58,11 +58,11 @@ class Playlist:
     def __len__(self) -> int:
         """Return the number of songs in the playlist"""
         return len(self._songs)
-    
+
     def add_song(self, song: Song) -> None:
         """Add a song to the playlist"""
         self._songs.append(song)
-    
+
     def remove_song(self, song: Song) -> None:
         """Remove a song from the playlist"""
         self._songs.remove(song)
@@ -70,7 +70,7 @@ class Playlist:
     def append_playlist(self, other: 'Playlist') -> None:
         """Append the songs from another playlist to this playlist"""
         self._songs.extend(other._songs)
-    
+
     def convert_to_string(self) -> str:
         """
         Return a string representation of the playlist specifically intended to be copy-pasted into a spotify playlist.
@@ -183,7 +183,7 @@ class Playlist:
 
 class SongManager:
     """Class to load, parse, and manage the song data"""
-    
+   
     def __init__(self, file_path: Optional[str] = None):
         """"""
         self._song_data_raw: list[dict[str, str]] = []
@@ -244,7 +244,7 @@ class SongManager:
         if track_id not in self._songs:
             return None
         return self._songs[track_id]
-    
+
 
 # TEST STUFF
 if __name__ == '__main__':
@@ -258,8 +258,3 @@ if __name__ == '__main__':
     playlist1.add_song(sm.get_song_by_id('4yzs6Ba0GQH55Zo66Q51PS'))
     # print(playlist1.recommend_songs(sm, 5))
     playlist2 = Playlist('playlist2')
-    playlist2.add_song(sm.get_song_by_id('4qPNDBW1i3p13qLCt0Ki3A'))
-    playlist2.add_song(sm.get_song_by_id('4qPNDBW1i3p13qLCt0Ki3A'))
-    playlist2.add_song(sm.get_song_by_id('4qPNDBW1i3p13qLCt0Ki3A'))
-    print(playlist1.taste_match(playlist2))
-    
