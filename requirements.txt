@@ -16,3 +16,5 @@ networkx
 numpy
 scipy
 kaleido
+
+sentence-transformers
