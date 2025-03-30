@@ -1,8 +1,40 @@
 {
   "init": {
-    "password": "init"
+    "password": "init",
+    "playlist": [
+      "6Vc5wAMmXdKIAM7WUoEb7N",
+      "7k9GuJYLp2AzqokyEdwEw2",
+      "0X9MxHR1rTkEHDjp95F2OO"
+    ]
   },
   "test1": {
-    "password": "12345"
+    "password": "12345",
+    "playlist": [
+      "6Vc5wAMmXdKIAM7WUoEb7N",
+      "7k9GuJYLp2AzqokyEdwEw2",
+      "0X9MxHR1rTkEHDjp95F2OO",
+      "2X5AFygz5SDYlXagyPw8kX",
+      "4x7AdVDV9IFWp8pg4LMz90",
+      "1dcNEEtODRVZEevQ20Cgmy",
+      "6huS9u0BDfeQHq0lObNLPl",
+      "14NiShC5b46yQxBN1mu9VJ",
+      "3DyhwZyBFedvnt68fMi6vf",
+      "6kRZfOZSuoi0Htg6gROKDz",
+      "5e9DrLUUZraUE7mmniufjn",
+      "2z3HKlpENvfz1Am2MNF2pL",
+      "33JX2be3eKVhl5xk8YQhVc",
+      "29Ns3avs48iQhNQgrHMEkm",
+      "2XDxQ3VzovLzh60zgOaNEi",
+      "0J4sK2VO75cRSVoj0FokQn",
+      "7bpR5j22mNID1pXwgRcZP1",
+      "1U1GtaJeYwGsPgqV9Me5bb"
+    ]
+  },
+  "test2": {
+    "password": "12345",
+    "playlist": [
+      "6Vc5wAMmXdKIAM7WUoEb7N",
+      "7k9GuJYLp2AzqokyEdwEw2",
+      "0X9MxHR1rTkEHDjp95F2OO"]
   }
 }

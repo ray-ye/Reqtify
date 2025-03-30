@@ -4,7 +4,7 @@ from typing import Optional
 def hover_effect(position, buttons):
     """Check if user is hovering over button and change the button accordingly."""
 
-    if any(button.check_hover(position) for button in buttons):
+    if any(button.check_hover(position) for button in buttons if button):
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
     else:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
@@ -88,3 +88,6 @@ class Button():
     def change_text(self, new_text):
         self.text = self.font.render(new_text, True, self.font_colour)
         self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
+
+    def update_image(self):
+        self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))

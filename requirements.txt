@@ -8,7 +8,7 @@ python-ta~=2.9.1
 
 # Graphics and data visualization
 plotly>=5.22.0
-pygame~=2.6.0
+pygame-ce
 pygame_gui
 
 # Specific to a later exercise

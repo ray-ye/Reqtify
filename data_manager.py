@@ -3,6 +3,10 @@
 from csv import DictReader
 from typing import Optional
 from dataclasses import dataclass
+from button import Button
+import pygame
+import json
+
 
 
 @dataclass
@@ -48,12 +52,13 @@ class Song:
 
 
 class Playlist:
-    """This class has-a collection of song objects as well as  functions that help compute data of the playlist"""
+    """This class has-a collection of song objects as well as functions that help compute data of the playlist"""
 
-    def __init__(self, name: str, songs: Optional[list[Song]] = None):
+    def __init__(self, name: str, songs: Optional[dict] = None, ):
         """Initializes a playlist object with a name and an empty list of songs"""
         self.name: str = name
-        self._songs: list[Song] = songs if songs is not None else []
+        self._songs: dict = songs if songs is not None else {}  # I changed this to a dict mapping id to song object - R
+        self._displays: dict = {}
 
     def __len__(self) -> int:
         """Return the number of songs in the playlist"""
@@ -61,15 +66,20 @@ class Playlist:
 
     def add_song(self, song: Song) -> None:
         """Add a song to the playlist"""
-        self._songs.append(song)
+        self._songs[song.track_id] = song
 
-    def remove_song(self, song: Song) -> None:
+    def remove_song(self, song) -> None:
         """Remove a song from the playlist"""
-        self._songs.remove(song)
+        del self._songs[song.track_id]
 
     def append_playlist(self, other: 'Playlist') -> None:
         """Append the songs from another playlist to this playlist"""
-        self._songs.extend(other._songs)
+        for song in other.get_songs().values():
+            self._songs[song.track_id] = song
+
+    def get_songs(self) -> dict:
+        """Return the list of songs in the playlist"""
+        return self._songs
 
     def convert_to_string(self) -> str:
         """
@@ -77,8 +87,8 @@ class Playlist:
         The format is 'spotify:track:{track_id}' for each song in the playlist.
         """
         res = []
-        for song in self._songs:
-            res.append(f'spotify:track:{song.track_id}')
+        for song_id in self._songs:
+            res.append(f'spotify:track:{song_id}')
         return '\n'.join(res)
     
     def taste_match(self, other: 'Playlist') -> float:
@@ -157,12 +167,16 @@ class Playlist:
         num_features = 7
         playlist_vector = [0] * num_features
 
+<<<<<<< Updated upstream
         for song in self._songs:
             song_vector = self._vectorize_song(song)
             for i in range(num_features):
                 playlist_vector[i] += song_vector[i]
         
         return [x / len(self._songs) for x in playlist_vector]
+=======
+        for song in self._songs.values():
+>>>>>>> Stashed changes
 
     def _cosine_similarity(self, vector1: list[float], vector2: list[float]) -> float:
         """
@@ -178,7 +192,127 @@ class Playlist:
         if norm1 == 0 or norm2 == 0:
             return 0
 
+<<<<<<< Updated upstream
+=======
+        mean_vector1 = [x / len(self._songs) for x in mean_vector1]
+
+        for song in other.get_songs().values():
+            mean_vector2[0] += song.is_explicit
+            mean_vector2[1] += song.energy
+            mean_vector2[2] += song.instrumentalness
+            mean_vector2[3] += song.acousticness
+            mean_vector2[4] += song.valence
+            mean_vector2[5] += song.mode
+
+            mean_vector2[6] += song.tempo / 200
+
+        mean_vector2 = [x / len(other._songs) for x in mean_vector2]
+
+        # Cosine(theta) = (A . B) / (|A| * |B|)
+        dot_product = sum(mean_vector1[i] * mean_vector2[i] for i in range(num_features))
+        norm1 = sum(x**2 for x in mean_vector1) ** 0.5
+        norm2 = sum(x**2 for x in mean_vector2) ** 0.5
+>>>>>>> Stashed changes
         return dot_product / (norm1 * norm2)
+
+    def load_displays(self, screen, start_height) -> None:
+        self._displays = {}
+        margin = 15
+        button_margin = 25
+        pos = (margin, start_height)
+        max_height = screen.get_height()
+        rect_dimensions = (screen.get_width() / 2 - margin * 1.5, 65)
+        save_button_size = rect_dimensions[1] - 40
+
+        for i in range(len(self._songs)):
+            if (i + 1) % 2 == 0 and not pos[1] + rect_dimensions[1] + margin > max_height:
+                pos = (margin * 2 + rect_dimensions[0], pos[1])
+
+            elif i == 0:
+                pos = (margin, pos[1])
+
+            else:
+                pos = (margin, pos[1] + rect_dimensions[1] + margin)
+
+                if pos[1] + rect_dimensions[1] + margin > max_height:
+                    return
+
+            save_button = Button("assets/unheart.png",
+                                 (pos[0] + rect_dimensions[0] - save_button_size / 2 - button_margin,
+                                  pos[1] + rect_dimensions[1] / 2 + 3),
+                                 (save_button_size, save_button_size))
+
+            self._displays[list(self._songs.values())[i].track_id] = Display(pos, rect_dimensions, list(self._songs.values())[i], save_button)
+
+    def update_display(self, user):
+        for display in self._displays:
+            if display in user.playlist.get_songs():
+                self._displays[display].button.image = pygame.image.load("assets/heart.png").convert_alpha()
+                self._displays[display].button.update_image()
+            else:
+                self._displays[display].button.image = pygame.image.load("assets/unheart.png").convert_alpha()
+                self._displays[display].button.update_image()
+
+    def draw(self, screen) -> None:
+        for display in self._displays.values():
+            display.draw(screen)
+
+    def get_displays(self) -> dict:
+        return self._displays
+
+
+
+class Display():
+
+    def __init__(self, pos, dimension, song: Song, save_button):
+        self.pos = pos
+        self.dimension = dimension
+        self.song = song
+        self.button = save_button
+
+    def draw(self, screen):
+        margin = 25
+        font_size1 = 20
+        font_size2 = 12
+        font1 = pygame.font.SysFont("Arial", font_size1)
+        font2 = pygame.font.SysFont("Arial", font_size2)
+        rect = pygame.Rect(self.pos, self.dimension)
+
+        save_button_size = self.dimension[1] - 40
+        album_cover_size = self.dimension[1] - 10
+
+        if len(self.song.artists) > 2:
+            artists = ', '.join(self.song.artists[:2]) + " & more"
+        else:
+            artists = ', '.join(self.song.artists)
+
+        while font1.size(self.song.track_name)[0] > self.dimension[0] - save_button_size - album_cover_size - margin * 2:
+            font_size1 -= 1
+            font1 = pygame.font.SysFont("Arial", font_size1, bold=True)
+
+        while font2.size(artists)[0] > self.dimension[0] - save_button_size - album_cover_size - margin * 2:
+            font_size2 -= 1
+            font2 = pygame.font.SysFont("Arial", font_size2)
+
+        #  if ever progressing with the project in the future,
+        #  change this into an instance attribute and move it into playlist.load_display
+        album_cover = Button("assets/album_cover.png",
+                             (self.pos[0] + album_cover_size / 2 + margin - 20, self.pos[1] + self.dimension[1] / 2),
+                             (album_cover_size, album_cover_size))
+
+
+        text1 = font1.render(self.song.track_name, True, (30, 30, 30))
+        text2 = font2.render(artists, True, (30, 30, 30))
+
+        text1_rect = text1.get_rect(topleft=(album_cover.get_pos()[0] + album_cover_size / 2 + margin - 15, self.pos[1] + margin - 12))
+        text2_rect = text2.get_rect(topleft=(text1_rect.x, text1_rect.y + text1.get_height()))
+
+        pygame.draw.rect(screen, "white", rect, border_radius=3)
+        album_cover.draw(screen)
+        self.button.draw(screen)
+        screen.blit(text1, text1_rect)
+        screen.blit(text2, text2_rect)
+
 
 
 class SongManager:
@@ -246,6 +380,145 @@ class SongManager:
         return self._songs[track_id]
 
 
+@dataclass
+class User:
+    """A user class storing all useful login/registeration functions for quick referral.
+
+    Instance Attributes:
+        - name: A string of the name of user:
+        - password: A string of the password of user
+    """
+
+    name: str
+    password: str
+    playlist: Playlist
+
+
+class Accounts:
+    """A manager class for user accounts"""
+    _accounts: dict[str, User]
+
+    def __init__(self, data_file: str) -> None:
+        """Initialize accounts by reading data from appropriate account file"""
+        self._accounts = self.load(data_file)
+
+    @staticmethod
+    def load(account_file: str) -> dict[str, User]:
+        """Load account data from json data file into a dictionary mapping the username to user object"""
+
+        with open(account_file, "r") as file:
+            account_data = json.load(file)
+
+        user_dict = {}
+        song_data = DataManager()
+        song_data.load_data_raw('dataset.csv')
+        song_data.parse_data()
+
+        for username in account_data:
+            playlist = Playlist(username)
+
+            for track_id in account_data[username]["playlist"]:
+                playlist.add_song(song_data.get_song_by_id(track_id))
+
+            user_obj = User(username, account_data[username]["password"], playlist)
+            user_dict[username] = user_obj
+
+        return user_dict
+
+    def get_account(self, name: Optional[str] = None) -> dict[str, User] | User:
+        """An accessor method used to access account object"""
+
+        if name is None:
+            return self._accounts
+        else:
+            return self._accounts[name]
+
+    def get_all_name(self) -> set:
+        """Return a set of all usernames"""
+        return set(self._accounts.keys())
+
+    def exist(self, username) -> bool:
+        """Check if user exists via their username"""
+        return username in self.get_all_name()
+
+    def login(self, name: str, password: str) -> bool:
+        """Check if name and passsword entered by user is the same as account info in database"""
+
+        if name in self._accounts and password == self._accounts[name].password:
+            return True
+        else:
+            return False
+
+    def register(self, name: str, password: str) -> None:
+        """Register a new account into the database with initial default game data"""
+
+        self._accounts[name] = User(name, password, Playlist(name))
+
+        account_data = {}
+
+        for account in self._accounts:
+            data = self._accounts[account]
+            account_data[account] = {"password": data.password, "playlist": []}
+
+        with open("account_data.json", "w") as f:
+            json.dump(account_data, f, indent=2)
+
+    def save(self):
+        """Saves account data into account database"""
+        account_data = {}
+
+        with open("account_data.json", "w") as f:
+            for username in self._accounts:
+                account_data[username] = {"password": self._accounts[username].password,
+                                          "playlist":
+                                              [song.track_id for song in self._accounts[username].playlist.get_songs()]
+                                          }
+
+            json.dump(self._accounts, f, indent=2)
+
+    def handle_login(self, username) -> User | None:
+        """A function to help manage the prompt message for user account info，
+        Return user oject containing user info"""
+
+        return self.get_account()[username]
+
+    def error(self, username, password, re_password, get_message: Optional[bool] = None) -> bool | str:
+        """Return whether error has occured, and if get_message, return the error message."""
+
+        error_message = ""
+        error = False
+
+        if any(not item for item in [username, password, re_password]):
+            error = True
+            error_message = "Please fill out all boxes."
+
+        elif len(username) < 2 or len(username) > 8:
+            error = True
+            error_message = "Username should be 2 to 8 characters long."
+
+        elif len(password) < 5 or len(password) > 8:
+            error = True
+            error_message = "Password should be 5 to 8 characters long."
+
+        elif any(" " in x for x in [username, password, re_password]):
+            error = True
+            error_message = "Empty spaces are not allowed in username or password."
+
+        elif password != re_password:
+            error = True
+            error_message = "Passwords do not match."
+
+        elif self.exist(username):
+            error = True
+            error_message = "Username is taken."
+
+        if get_message:
+            return error_message
+
+        else:
+            return error
+
+
 # TEST STUFF
 if __name__ == '__main__':
     sm = SongManager()
@@ -258,3 +531,39 @@ if __name__ == '__main__':
     playlist1.add_song(sm.get_song_by_id('4yzs6Ba0GQH55Zo66Q51PS'))
     # print(playlist1.recommend_songs(sm, 5))
     playlist2 = Playlist('playlist2')
+<<<<<<< Updated upstream
+=======
+    playlist2.add_song(data_manager.get_song_by_id('4a9tbd947vo9K8Vti9JwcI'))
+    playlist2.add_song(data_manager.get_song_by_id('6cvGDClEIomp5CfKY3pQuZ'))
+    playlist2.add_song(data_manager.get_song_by_id('1KNi6PNEbQYnkxmqeschok'))
+
+    # eminem
+    playlist3 = Playlist('playlist3')
+    playlist3.add_song(data_manager.get_song_by_id('5W8HXMOMLtXLz0RGKUtnlZ'))
+    playlist3.add_song(data_manager.get_song_by_id('3r9m79pHykbs4FrCXlq1oO'))
+    playlist3.add_song(data_manager.get_song_by_id('1FJYqedfrSGitGHMvwRGBg'))
+
+    # juice wrld
+    playlist4 = Playlist('playlist4')
+    playlist4.add_song(data_manager.get_song_by_id('6XO8RlYuJCiI0v3IA48FeJ'))
+
+    print(playlist1.cosine_similarity(playlist2)) # 0.97
+    print(playlist1.cosine_similarity(playlist3)) # 0.60
+    print(playlist1.cosine_similarity(playlist4)) # 0.50
+    print(playlist3.cosine_similarity(playlist4)) # 0.96
+
+    print(playlist2.convert_to_string())
+
+    #['acoustic', 'afrobeat', 'alt-rock', 'alternative', 'ambient', 'anime', 'black-metal', 'bluegrass', 'blues', 'brazil', 'breakbeat', 'british', 'cantopop', 'chicago-house', 'children', 'chill', 'classical', 'club', 'comedy', 'country', 'dance', 'dancehall', 'death-metal', 'deep-house', 'detroit-techno', 'disco', 'disney', 'drum-and-bass', 'dub', 'dubstep', 'edm', 'electro', 'electronic', 'emo', 'folk', 'forro', 'french', 'funk', 'garage', 'german', 'gospel', 'goth', 'grindcore', 'groove', 'grunge', 'guitar', 'happy', 'hard-rock', 'hardcore', 'hardstyle', 'heavy-metal', 'hip-hop', 'honky-tonk', 'house', 'idm', 'indian', 'indie-pop', 'indie', 'industrial', 'iranian', 'j-dance', 'j-idol', 'j-pop', 'j-rock', 'jazz', 'k-pop', 'kids', 'latin', 'latino', 'malay', 'mandopop', 'metal', 'metalcore', 'minimal-techno', 'mpb', 'new-age', 'opera', 'pagode', 'party', 'piano', 'pop-film', 'pop', 'power-pop', 'progressive-house', 'psych-rock', 'punk-rock', 'punk', 'r-n-b', 'reggae', 'reggaeton', 'rock-n-roll', 'rock', 'rockabilly', 'romance', 'sad', 'salsa', 'samba', 'sertanejo', 'show-tunes', 'singer-songwriter', 'ska', 'sleep', 'songwriter', 'soul', 'spanish', 'study', 'swedish', 'synth-pop', 'tango', 'techno', 'trance', 'trip-hop', 'turkish', 'world-music']
+
+if __name__ == "__main__":
+    # pass
+    # When you are ready to check your work with python_ta, uncomment the following lines.
+    # (Delete the "#" and space before each line.)
+    # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'disable': ['R1705', 'E9998', 'E9999']
+    })
+>>>>>>> Stashed changes
