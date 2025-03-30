@@ -5,11 +5,7 @@ import pygame_gui
 import sys
 from typing import Optional
 
-<<<<<<< Updated upstream
-from account_manager import Accounts, User
 
-=======
->>>>>>> Stashed changes
 from settings import Settings
 from button import Button, hover_effect
 from textbox import TextBox
@@ -46,11 +42,6 @@ playlist1.add_song(data_manager.get_song_by_id('5SuOikwiRyPMVoIQDJUgSV'))
 playlist1.add_song(data_manager.get_song_by_id('4qPNDBW1i3p13qLCt0Ki3A'))
 playlist1.add_song(data_manager.get_song_by_id('1iJBSr7s7jYXzM8EGcbK5b'))
 playlist1.add_song(data_manager.get_song_by_id('6lfxq3CG4xtTiEg7opyCyx'))
-
-
-
-
-
 
 
 # main menu
