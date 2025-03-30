@@ -37,7 +37,7 @@ class MusicFeatureGuesser:
 
         self.sentence_embeddings = self.embedder.encode(self.sentences)
 
-    def predict_features(self, user_input: str, tolerance: int = 3):
+    def predict_features(self, user_input: str, tolerance: int=3):
         """
         Predicts the music features based on the user input. A higher tolerance implies a lower threshold for similarity.
         Preconditions:
@@ -63,8 +63,8 @@ if __name__ == '__main__':
     # Example usage
     file_path = 'reference_data.csv'
     guesser = MusicFeatureGuesser(file_path)
-    user_input = "I want a song that is energetic and but very unhappy"
-    tolerance = 3
+    user_input = "Upbeat study music"
+    tolerance = 5
     features = guesser.predict_features(user_input, tolerance)
     for feature_name, value in zip(guesser.features, features):
         print(feature_name, ":", value)

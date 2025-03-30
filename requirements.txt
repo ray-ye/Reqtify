@@ -17,4 +17,8 @@ numpy
 scipy
 kaleido
 
+# Sentence embeddings and similarity
 sentence-transformers
+
+# Copy to clipboard
+pyperclip
