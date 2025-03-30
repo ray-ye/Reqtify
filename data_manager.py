@@ -90,7 +90,7 @@ class Playlist:
         for song_id in self._songs:
             res.append(f'spotify:track:{song_id}')
         return '\n'.join(res)
-    
+
     def taste_match(self, other: 'Playlist') -> float:
         """Return a percentage indicating how similar the taste in music is between two playlists"""
         if len(self._songs) == 0 or len(other._songs) == 0:
@@ -115,7 +115,7 @@ class Playlist:
             song_vector = self._vectorize_song(song)
             similarity = self._cosine_similarity(playlist_vector, song_vector)
             recommended_songs.append((song, similarity))
-        
+
         # Sort by similarity first, then by popularity
         recommended_songs.sort(key=lambda x: (x[1], x[0].popularity), reverse=True)
         return [x[0] for x in recommended_songs[:limit]]
@@ -133,7 +133,7 @@ class Playlist:
             'avg_happiness': avg_valence
         }
         return res
-    
+
     def _top_genre(self) -> str:
         """Return the top genre in the playlist"""
         genre_count = {}
@@ -142,14 +142,14 @@ class Playlist:
             if genre not in genre_count:
                 genre_count[genre] = 0
             genre_count[genre] += 1
-        
+
         top_genre = None
         max_count = 0
         for genre, count in genre_count.items():
             if count > max_count:
                 top_genre = genre
                 max_count = count
-        
+
         return genre
 
     def _vectorize_song(self, song: Song) -> list[float]:
@@ -172,7 +172,7 @@ class Playlist:
             song_vector = self._vectorize_song(song)
             for i in range(num_features):
                 playlist_vector[i] += song_vector[i]
-        
+
         return [x / len(self._songs) for x in playlist_vector]
 =======
         for song in self._songs.values():
@@ -317,12 +317,12 @@ class Display():
 
 class SongManager:
     """Class to load, parse, and manage the song data"""
-   
+
     def __init__(self, file_path: Optional[str] = None):
         """"""
         self._song_data_raw: list[dict[str, str]] = []
         self._songs: dict[str, Song] = {}
-        
+
         if file_path is not None:
             self.load_data_raw(file_path)
             self.parse_data()
@@ -524,7 +524,7 @@ if __name__ == '__main__':
     sm = SongManager()
     sm.load_data_raw('dataset.csv')
     sm.parse_data()
-    
+
     playlist1 = Playlist('playlist1')
     playlist1.add_song(sm.get_song_by_id('5SuOikwiRyPMVoIQDJUgSV'))
     playlist1.add_song(sm.get_song_by_id('4qPNDBW1i3p13qLCt0Ki3A'))
