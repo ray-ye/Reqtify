@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from button import Button
 import pygame
 import json
-
+import pyperclip
 
 
 @dataclass
@@ -91,6 +91,11 @@ class Playlist:
         for song_id in self._songs:
             res.append(f'spotify:track:{song_id}')
         return '\n'.join(res)
+    
+    def copy_to_clipboard(self) -> None:
+        """Copy the playlist to the clipboard"""
+        pyperclip.copy(self.convert_to_string())
+        pyperclip.paste()
 
     def taste_match(self, other: 'Playlist') -> float:
         """Return a percentage indicating how similar the taste in music is between two playlists"""
@@ -511,6 +516,7 @@ if __name__ == '__main__':
     playlist1.add_song(sm.get_song_by_id('4yzs6Ba0GQH55Zo66Q51PS'))
     playlist2 = Playlist('playlist2')
     playlist2.add_song(sm.get_song_by_id('6twCOHBycvvQFXJl4CrbvZ'))
+    playlist1.copy_to_clipboard()
 
     print(playlist1.taste_match(playlist2))
     # When you are ready to check your work with python_ta, uncomment the following lines.
