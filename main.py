@@ -24,14 +24,17 @@ pygame.font.init()
 ICON = pygame.image.load("assets/small_logo.png")
 pygame.display.set_icon(ICON)
 
-SCREEN = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
-ui_manager = pygame_gui.UIManager((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT), "theme.json")
+screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
+ui_manager = pygame_gui.UIManager((screen.get_width(), screen.get_height()), "theme.json")
 
 
 CLOCK = pygame.time.Clock()
 
-big_logo = pygame.transform.scale(pygame.image.load("assets/big_logo.png"), (700 * .5, 300 * .5))
-big_logo_rect = big_logo.get_rect(center=(Settings.SCREEN_WIDTH / 2, 250))
+big_logo = pygame.image.load("assets/big_logo.png").convert_alpha()
+big_logo = pygame.transform.smoothscale(big_logo, (pygame.image.load("assets/compute_button.png").get_width(),
+                                                   pygame.image.load("assets/compute_button.png").get_height()))
+
+big_logo_rect = big_logo.get_rect(center=(screen.get_width() / 2, screen.get_height() / 2 - 140))
 
 data_manager = SongManager()
 data_manager.load_data_raw('small.csv')
@@ -47,12 +50,14 @@ playlist1.add_song(data_manager.get_song_by_id('6lfxq3CG4xtTiEg7opyCyx'))
 # main menu
 def login_selection():
     """Handler function for the login screen of the app"""
+    global screen
+
     pygame.display.set_caption("Reqtify Login")
 
     # button settings
     button_margin = 140
     button_font = "Arial"
-    button_font_size = 35
+    button_font_size = 30
     font_colour = (30, 30, 30)
     button_colour = (255, 255, 255)
     button_size = (200, 60)  # width, height
@@ -87,24 +92,28 @@ def login_selection():
 
     while True:
 
-        SCREEN.fill(Settings.BACKGROUND_COLOUR)
+        screen.fill(Settings.BACKGROUND_COLOUR)
 
         # get mouse position
         mouse_pos = pygame.mouse.get_pos()
 
         # draw logo onto screen
-        SCREEN.blit(big_logo, big_logo_rect)
+        screen.blit(big_logo, big_logo_rect)
 
         # update buttons
         for button in buttons:
             hover_effect(mouse_pos, buttons)
-            button.draw(SCREEN)
+            button.draw(screen)
 
         # check for user input
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+            if event.type == pygame.VIDEORESIZE:
+                screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if login_button.check_hover(mouse_pos):
                     login(register=False)
@@ -122,7 +131,7 @@ def login(register):
     re_password = ""
     error_message = ""
 
-    login_form = Form((Settings.SCREEN_WIDTH / 2, Settings.SCREEN_HEIGHT / 2),
+    login_form = Form((screen.get_width() / 2, screen.get_height() / 2),
                       ui_manager,
                       "Login",
                       (255, 255, 255),
@@ -142,16 +151,16 @@ def login(register):
             holder.set_text_hidden(True)
 
     while True:
-        SCREEN.fill(Settings.BACKGROUND_COLOUR)
+        screen.fill(Settings.BACKGROUND_COLOUR)
         refresh_rate = CLOCK.tick(60)/1000
         mouse_pos = pygame.mouse.get_pos()
         hover_effect(mouse_pos, [login_form.button])
-        login_form.draw(SCREEN)
+        login_form.draw(screen)
         ui_manager.update(refresh_rate)
-        ui_manager.draw_ui(SCREEN)
+        ui_manager.draw_ui(screen)
 
         if login_form.error:
-            login_form.error_message(error_message, SCREEN)
+            login_form.error_message(error_message, screen)
 
         for event in pygame.event.get():
             ui_manager.process_events(event)
@@ -197,12 +206,12 @@ def login(register):
 
 def main_menu():
     """Handler function for the main menu/home screen of the app"""
-    ui_manager2 = pygame_gui.UIManager((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT), "theme.json")
+    ui_manager2 = pygame_gui.UIManager((screen.get_width(), screen.get_height()), "theme.json")
     pygame.display.set_caption("Reqtify")
     margin = 20
     font = pygame.font.SysFont("Georgia", 75)
     font.set_bold(True)
-    textbox = TextBox((150, 500),
+    textbox = TextBox((screen.get_width() / 2 - font.size("Describe")[0] / 2, 500),
                       (font.size("Describe")[0], 50),
                       ui_manager2,
                       "user_input",
@@ -213,21 +222,22 @@ def main_menu():
     compute_button = Button("assets/compute_button.png",
                             (textbox.get_pos()[0] + textbox.get_dimensions()[0] / 2,
                              textbox.get_pos()[1] + textbox.get_dimensions()[1] + margin * 3),
-                            (650 * .4, 150 * .4))
+                            (pygame.image.load("assets/compute_button.png").get_width() * .7,
+                             pygame.image.load("assets/compute_button.png").get_height() * .7))
 
     search_button = Button("assets/search.png",
                            (margin * 3, margin * 3),
                            (50, 50))
 
     profile_button = Button("assets/profile.png",
-                            (Settings.SCREEN_WIDTH - margin * 3, margin * 3),
+                            (screen.get_width() - margin * 3, margin * 3),
                             (50, 50))
 
     buttons = [compute_button, search_button, profile_button]
     title = ["Describe", "Your", "Perfect", "Playlist"]
 
     while True:
-        SCREEN.fill(Settings.BACKGROUND_COLOUR)
+        screen.fill(Settings.BACKGROUND_COLOUR)
 
         # get mouse position
         mouse_pos = pygame.mouse.get_pos()
@@ -242,17 +252,17 @@ def main_menu():
             text = font.render(line, True, (255, 255, 255))
             text_rect = text.get_rect(topleft=(title_x, title_start_height))
             title_start_height += text_rect.height
-            SCREEN.blit(text, text_rect)
+            screen.blit(text, text_rect)
 
             font.set_underline(False)
 
         for button in buttons:
-            button.draw(SCREEN)
+            button.draw(screen)
 
         textbox.set_pos((title_x, title_start_height))
         refresh_rate = CLOCK.tick(60) / 1000
         ui_manager2.update(refresh_rate)
-        ui_manager2.draw_ui(SCREEN)
+        ui_manager2.draw_ui(screen)
         pygame.display.update()
 
         # check for user input
@@ -269,6 +279,9 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if compute_button.check_hover(mouse_pos):
                     pass  # pass user input into a parsing function
+
+                if profile_button.check_hover(mouse_pos):
+                    profile()
 
                 if search_button.check_hover(mouse_pos):
                     pass
@@ -288,7 +301,7 @@ def match():
 
 def profile():
     """Handler function for the profile page"""
-
+    global screen
     pygame.display.set_caption("Reqtify")
     margin = 20
 
@@ -297,25 +310,36 @@ def profile():
                            (50, 50))
 
     profile_button = Button("assets/profile.png",
-                            (Settings.SCREEN_WIDTH - margin * 3, margin * 3),
+                            (screen.get_width() - margin * 3, margin * 3),
                             (50, 50))
 
-    cur_user.playlist.load_displays(SCREEN, 130)
-    cur_user.playlist.update_display(cur_user)
+    up_button = Button("assets/up_button.png",
+                            (screen.get_width() / 2 - margin * 1.5, screen.get_height() - 65),
+                            (50, 50))
 
-    buttons = [home_button, profile_button]
-    save_buttons = [display.button for display in cur_user.playlist.get_displays().values()]
+    down_button = Button("assets/down_button.png",
+                            (screen.get_width() / 2 + margin * 1.5, screen.get_height() - 65),
+                            (50, 50))
+
+    cur_user.playlist.load_displays(screen, 150, list(cur_user.playlist.get_songs().values()))
+    cur_user.playlist.update_display(cur_user)
+    display_start_row = 0
+
+    song_holder = list(cur_user.playlist.get_songs().values())
+    buttons = [home_button, profile_button, up_button, down_button]
+
 
     while True:
-        SCREEN.fill(Settings.BACKGROUND_COLOUR)
+        screen.fill(Settings.BACKGROUND_COLOUR)
+        save_buttons = [display.button for display in cur_user.playlist.get_displays().values()]
 
         # get mouse position
         mouse_pos = pygame.mouse.get_pos()
 
         for button in buttons:
-            button.draw(SCREEN)
+            button.draw(screen)
 
-        cur_user.playlist.draw(SCREEN)
+        cur_user.playlist.draw(screen)
 
         hover_effect(mouse_pos, buttons + save_buttons)
         pygame.display.update()
@@ -329,12 +353,28 @@ def profile():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if home_button.check_hover(mouse_pos):
-                    pass  # pass user input into a parsing function
+                    main_menu()  # pass user input into a parsing function
 
                 if profile_button.check_hover(mouse_pos):
                     pass
 
+                if up_button.check_hover(mouse_pos):
+                    print(list(cur_user.playlist.get_displays().values())[0].song.track_name)
+                    print(song_holder[0])
+                    print(len(cur_user.playlist.get_displays()))
+                    if list(cur_user.playlist.get_displays().values())[0].song != song_holder[0]:
+                        display_start_row -= 2
+                        cur_user.playlist.load_displays(screen, 150, song_holder[display_start_row:])
+                        cur_user.playlist.update_display(cur_user)
+
+                if down_button.check_hover(mouse_pos):
+                    if len(song_holder[display_start_row:]) > 2:
+                        display_start_row += 2
+                        cur_user.playlist.load_displays(screen, 150, song_holder[display_start_row:])
+                        cur_user.playlist.update_display(cur_user)
+
                 for display in cur_user.playlist.get_displays().values():
+
                     if display.button.check_hover(mouse_pos):
                         if display.song.track_id in cur_user.playlist.get_songs():
                             cur_user.playlist.remove_song(display.song)
@@ -350,7 +390,9 @@ def profile():
 
 
 
-def choose():
+
+
+def ouptut():
     """handler function for the choose song page"""
     pass
 

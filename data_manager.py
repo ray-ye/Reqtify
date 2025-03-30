@@ -58,6 +58,7 @@ class Playlist:
         """Initializes a playlist object with a name and an empty list of songs"""
         self.name: str = name
         self._songs: dict = songs if songs is not None else {}  # I changed this to a dict mapping id to song object - R
+
         self._displays: dict = {}
 
     def __len__(self) -> int:
@@ -190,16 +191,16 @@ class Playlist:
 
         return dot_product / (norm1 * norm2)
 
-    def load_displays(self, screen, start_height) -> None:
+    def load_displays(self, screen, start_height, songs: list[Song]) -> None:
         self._displays = {}
         margin = 15
         button_margin = 25
         pos = (margin, start_height)
-        max_height = screen.get_height()
+        max_height = screen.get_height() - 100
         rect_dimensions = (screen.get_width() / 2 - margin * 1.5, 65)
         save_button_size = rect_dimensions[1] - 40
 
-        for i in range(len(self._songs)):
+        for i in range(len(songs)):
             if (i + 1) % 2 == 0 and not pos[1] + rect_dimensions[1] + margin > max_height:
                 pos = (margin * 2 + rect_dimensions[0], pos[1])
 
@@ -208,7 +209,6 @@ class Playlist:
 
             else:
                 pos = (margin, pos[1] + rect_dimensions[1] + margin)
-
                 if pos[1] + rect_dimensions[1] + margin > max_height:
                     return
 
@@ -217,7 +217,8 @@ class Playlist:
                                   pos[1] + rect_dimensions[1] / 2 + 3),
                                  (save_button_size, save_button_size))
 
-            self._displays[list(self._songs.values())[i].track_id] = Display(pos, rect_dimensions, list(self._songs.values())[i], save_button)
+            self._displays[songs[i].track_id] = Display(pos, rect_dimensions, songs[i], save_button)
+
 
     def update_display(self, user):
         for display in self._displays:
@@ -227,6 +228,7 @@ class Playlist:
             else:
                 self._displays[display].button.image = pygame.image.load("assets/unheart.png").convert_alpha()
                 self._displays[display].button.update_image()
+
 
     def draw(self, screen) -> None:
         for display in self._displays.values():
@@ -287,6 +289,9 @@ class Display():
         self.button.draw(screen)
         screen.blit(text1, text1_rect)
         screen.blit(text2, text2_rect)
+
+    def set_pos(self, pos):
+        self.pos = pos
 
 
 
@@ -507,7 +512,7 @@ if __name__ == '__main__':
     playlist2 = Playlist('playlist2')
     playlist2.add_song(sm.get_song_by_id('6twCOHBycvvQFXJl4CrbvZ'))
 
-    print(playlist1.taste_match(playlist2))       
+    print(playlist1.taste_match(playlist2))
     # When you are ready to check your work with python_ta, uncomment the following lines.
     # (Delete the "#" and space before each line.)
     # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block
