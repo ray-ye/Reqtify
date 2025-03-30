@@ -1,0 +1,17 @@
+sentence, is_explicit, is_energetic, is_instrumental, is_acoustic, is_happy, is_loud, is_major, is_danceable, is_live, is_fast
+An upbeat pop song with a catchy melody and a driving beat, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1
+A slow ballad with emotional lyrics and a soft piano accompaniment, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0
+A high-energy rock anthem with powerful guitar riffs and anthemic choruses, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1
+A mellow acoustic track with soothing vocals and gentle guitar strumming, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0
+A lively dance track with a strong beat and infectious rhythm, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1
+Romantic music for a candlelit dinner, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0
+Calm music for a late-night study session, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0
+High-energy music for a workout session, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1
+Soothing music for a yoga class, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0
+Hype music for a rave party, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1
+Sad music to cry to, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0
+Some music to play while very frustrated, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0
+A catchy pop song to sing along to, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1
+A super loud rock song to blast in the car, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1
+A soft instrumental piece for meditation, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0
+A concert recording of some nostalgic 2010s pop music, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0

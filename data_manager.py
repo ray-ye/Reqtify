@@ -167,16 +167,12 @@ class Playlist:
         num_features = 7
         playlist_vector = [0] * num_features
 
-<<<<<<< Updated upstream
-        for song in self._songs:
+        for song in self._songs.values():
             song_vector = self._vectorize_song(song)
             for i in range(num_features):
                 playlist_vector[i] += song_vector[i]
 
         return [x / len(self._songs) for x in playlist_vector]
-=======
-        for song in self._songs.values():
->>>>>>> Stashed changes
 
     def _cosine_similarity(self, vector1: list[float], vector2: list[float]) -> float:
         """
@@ -192,27 +188,6 @@ class Playlist:
         if norm1 == 0 or norm2 == 0:
             return 0
 
-<<<<<<< Updated upstream
-=======
-        mean_vector1 = [x / len(self._songs) for x in mean_vector1]
-
-        for song in other.get_songs().values():
-            mean_vector2[0] += song.is_explicit
-            mean_vector2[1] += song.energy
-            mean_vector2[2] += song.instrumentalness
-            mean_vector2[3] += song.acousticness
-            mean_vector2[4] += song.valence
-            mean_vector2[5] += song.mode
-
-            mean_vector2[6] += song.tempo / 200
-
-        mean_vector2 = [x / len(other._songs) for x in mean_vector2]
-
-        # Cosine(theta) = (A . B) / (|A| * |B|)
-        dot_product = sum(mean_vector1[i] * mean_vector2[i] for i in range(num_features))
-        norm1 = sum(x**2 for x in mean_vector1) ** 0.5
-        norm2 = sum(x**2 for x in mean_vector2) ** 0.5
->>>>>>> Stashed changes
         return dot_product / (norm1 * norm2)
 
     def load_displays(self, screen, start_height) -> None:
@@ -410,7 +385,7 @@ class Accounts:
             account_data = json.load(file)
 
         user_dict = {}
-        song_data = DataManager()
+        song_data = SongManager()
         song_data.load_data_raw('dataset.csv')
         song_data.parse_data()
 
@@ -529,35 +504,10 @@ if __name__ == '__main__':
     playlist1.add_song(sm.get_song_by_id('5SuOikwiRyPMVoIQDJUgSV'))
     playlist1.add_song(sm.get_song_by_id('4qPNDBW1i3p13qLCt0Ki3A'))
     playlist1.add_song(sm.get_song_by_id('4yzs6Ba0GQH55Zo66Q51PS'))
-    # print(playlist1.recommend_songs(sm, 5))
     playlist2 = Playlist('playlist2')
-<<<<<<< Updated upstream
-=======
-    playlist2.add_song(data_manager.get_song_by_id('4a9tbd947vo9K8Vti9JwcI'))
-    playlist2.add_song(data_manager.get_song_by_id('6cvGDClEIomp5CfKY3pQuZ'))
-    playlist2.add_song(data_manager.get_song_by_id('1KNi6PNEbQYnkxmqeschok'))
+    playlist2.add_song(sm.get_song_by_id('6twCOHBycvvQFXJl4CrbvZ'))
 
-    # eminem
-    playlist3 = Playlist('playlist3')
-    playlist3.add_song(data_manager.get_song_by_id('5W8HXMOMLtXLz0RGKUtnlZ'))
-    playlist3.add_song(data_manager.get_song_by_id('3r9m79pHykbs4FrCXlq1oO'))
-    playlist3.add_song(data_manager.get_song_by_id('1FJYqedfrSGitGHMvwRGBg'))
-
-    # juice wrld
-    playlist4 = Playlist('playlist4')
-    playlist4.add_song(data_manager.get_song_by_id('6XO8RlYuJCiI0v3IA48FeJ'))
-
-    print(playlist1.cosine_similarity(playlist2)) # 0.97
-    print(playlist1.cosine_similarity(playlist3)) # 0.60
-    print(playlist1.cosine_similarity(playlist4)) # 0.50
-    print(playlist3.cosine_similarity(playlist4)) # 0.96
-
-    print(playlist2.convert_to_string())
-
-    #['acoustic', 'afrobeat', 'alt-rock', 'alternative', 'ambient', 'anime', 'black-metal', 'bluegrass', 'blues', 'brazil', 'breakbeat', 'british', 'cantopop', 'chicago-house', 'children', 'chill', 'classical', 'club', 'comedy', 'country', 'dance', 'dancehall', 'death-metal', 'deep-house', 'detroit-techno', 'disco', 'disney', 'drum-and-bass', 'dub', 'dubstep', 'edm', 'electro', 'electronic', 'emo', 'folk', 'forro', 'french', 'funk', 'garage', 'german', 'gospel', 'goth', 'grindcore', 'groove', 'grunge', 'guitar', 'happy', 'hard-rock', 'hardcore', 'hardstyle', 'heavy-metal', 'hip-hop', 'honky-tonk', 'house', 'idm', 'indian', 'indie-pop', 'indie', 'industrial', 'iranian', 'j-dance', 'j-idol', 'j-pop', 'j-rock', 'jazz', 'k-pop', 'kids', 'latin', 'latino', 'malay', 'mandopop', 'metal', 'metalcore', 'minimal-techno', 'mpb', 'new-age', 'opera', 'pagode', 'party', 'piano', 'pop-film', 'pop', 'power-pop', 'progressive-house', 'psych-rock', 'punk-rock', 'punk', 'r-n-b', 'reggae', 'reggaeton', 'rock-n-roll', 'rock', 'rockabilly', 'romance', 'sad', 'salsa', 'samba', 'sertanejo', 'show-tunes', 'singer-songwriter', 'ska', 'sleep', 'songwriter', 'soul', 'spanish', 'study', 'swedish', 'synth-pop', 'tango', 'techno', 'trance', 'trip-hop', 'turkish', 'world-music']
-
-if __name__ == "__main__":
-    # pass
+    print(playlist1.taste_match(playlist2))       
     # When you are ready to check your work with python_ta, uncomment the following lines.
     # (Delete the "#" and space before each line.)
     # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block
@@ -566,4 +516,3 @@ if __name__ == "__main__":
         'max-line-length': 120,
         'disable': ['R1705', 'E9998', 'E9999']
     })
->>>>>>> Stashed changes

@@ -10,7 +10,7 @@ from settings import Settings
 from button import Button, hover_effect
 from textbox import TextBox
 from form_generator import Form
-from data_manager import Playlist, Song, User, Accounts, DataManager
+from data_manager import Playlist, Song, User, Accounts, SongManager
 
 
 # Initializing objects / variables
@@ -33,7 +33,7 @@ CLOCK = pygame.time.Clock()
 big_logo = pygame.transform.scale(pygame.image.load("assets/big_logo.png"), (700 * .5, 300 * .5))
 big_logo_rect = big_logo.get_rect(center=(Settings.SCREEN_WIDTH / 2, 250))
 
-data_manager = DataManager()
+data_manager = SongManager()
 data_manager.load_data_raw('small.csv')
 data_manager.parse_data()
 
