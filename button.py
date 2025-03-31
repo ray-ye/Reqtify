@@ -1,5 +1,5 @@
 """A module that deals with buttons, and mouse hovering over buttons."""
-from typing import Optional
+from typing import Optional, Any
 import pygame
 
 
@@ -31,7 +31,7 @@ class Button():
     - text_rect: rectangle that makes sure text is in the center of the rectangle.
     - rect: rectangle
     """
-    
+
     x_pos: tuple
     y_pos: tuple
     image: Any

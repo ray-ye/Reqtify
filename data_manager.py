@@ -135,7 +135,7 @@ class Playlist:
         recommended_songs.sort(key=lambda x: (x[1], x[0].popularity), reverse=True)
         return [x[0] for x in recommended_songs[:limit]]
 
-    def playlist_profile(self):
+    def playlist_profile(self) -> dict:
         """
         Return a dictionary with the 'profile' of the playlist, containing the top genre, average moods, etc.
         (in percentage).
@@ -296,7 +296,6 @@ class Display():
         margin = 25
         font_size1 = 20
         font_size2 = 12
-        song_name = ""
         font1 = pygame.font.SysFont("Arial", font_size1)
         font2 = pygame.font.SysFont("Arial", font_size2)
         rect = pygame.Rect(self.pos, self.dimension)
@@ -314,9 +313,7 @@ class Display():
         else:
             song_name = self.song.track_name
 
-        while (font1.size(song_name)[0] > 
-               self.dimension[0] - save_button_size - album_cover_size - margin * 2
-        ):
+        while font1.size(song_name)[0] > self.dimension[0] - save_button_size - album_cover_size - margin * 2:
             font_size1 -= 1
             font1 = pygame.font.SysFont("Arial", font_size1, bold=True)
 

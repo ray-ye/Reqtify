@@ -18,11 +18,11 @@ match() outputting result from search
 """
 
 from __future__ import annotations
+from typing import Optional, Any
 import random
 import pygame
 import pygame_gui
 import sys
-from typing import Optional, Any
 from settings import Settings
 from button import Button, hover_effect
 from textbox import TextBox

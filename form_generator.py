@@ -1,9 +1,9 @@
 """This is a module that contains a Form class that is responsible for building and executing form opertaions"""
 
+from typing import Any
 import pygame
 from textbox import TextBox
 from button import Button
-from typing import Optional, Any
 
 
 class Form():
@@ -106,8 +106,9 @@ class Form():
         else:
             position = self.rect.center[0], self.rect.centery - self.rect.height / 2
 
-        self.prompter[title] = TextBox(position, (width, 45), self.ui_manager, "#" + title.lower().replace(" ", ""),
-                                       True)
+        self.prompter[title] = TextBox(position, (width, 45), self.ui_manager,
+                                       "#" + title.lower().replace(" ", ""), True)
+                                       
     def draw(self, screen: Any) -> None:
         """Render all form elements to the specified surface.
 
