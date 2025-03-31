@@ -127,8 +127,18 @@ class Playlist:
         return [x[0] for x in recommended_songs[:limit]]
 
     def playlist_profile(self):
-        """Return a dictionary with the 'profile' of the playlist, containing the top genre, average moods, etc.
-        (in percentage)"""
+        """
+        Return a dictionary with the 'profile' of the playlist, containing the top genre, average moods, etc.
+        (in percentage).
+        """
+        if len(self._songs) == 0:
+            return {
+                'Top genre': '[Empty]',
+                'Avg energy': 0,
+                'Avg acousticness': 0,
+                'Avg instrumentalness': 0,
+                'Avg happiness': 0
+            }
         top_genre = self._top_genre()
         avg_energy, _, _, avg_acousticness, avg_instrumentalness, avg_valence, _ = self._vectorize_playlist()
 
