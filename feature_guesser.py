@@ -2,6 +2,7 @@
 import csv
 import torch
 import numpy as np
+from typing import Optional, Any
 from sentence_transformers import SentenceTransformer
 
 
@@ -15,7 +16,7 @@ class MusicFeatureGuesser:
     - sentence_music_features: a list of sentence music features
     - sentence_embeddings: a list of sentence embeddings
     """
-    embedder: any
+    embedder: Any
     features: list
     sentence_music_features: list
     sentence_embeddings: list
@@ -80,17 +81,12 @@ class MusicFeatureGuesser:
 
 
 if __name__ == '__main__':
-    # Example usage
-    # file_path = 'reference_data.csv'
-    # guesser = MusicFeatureGuesser(file_path)
-    # user_input = "Upbeat study music"
-    # tolerance = 5
-    # features = guesser.predict_features(user_input, tolerance)
-    # for feature_name, value in zip(guesser.features, features):
-    #     print(feature_name, ":", value)
 
     import python_ta
     python_ta.check_all(config={
         'max-line-length': 120,
         'disable': ['R1705', 'E9998', 'E9999']
     })
+
+    import doctest
+    doctest.testmod()

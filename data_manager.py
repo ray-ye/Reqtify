@@ -1,7 +1,7 @@
 """A module that contains classes that will help parse/process datasets"""
 
 from csv import DictReader
-from typing import Optional
+from typing import Optional, Any
 from dataclasses import dataclass
 import json
 import pygame
@@ -63,7 +63,7 @@ class Playlist:
     _songs: dict
     _displays: dict
 
-    def __init__(self, name: str, songs: Optional[dict] = None, ) -> None:
+    def __init__(self, name: str, songs: Optional[dict] = None) -> None:
         """Initializes a playlist object with a name and an empty list of songs"""
         self.name = name
         self._songs = songs if songs is not None else {}  # I changed this to a dict mapping id to song object - R
@@ -88,13 +88,20 @@ class Playlist:
             self._songs[song.track_id] = song
 
     def get_songs(self) -> dict:
-        """Return the list of songs in the playlist"""
+        """Return a dictionary mapping of songs in the playlist"""
         return self._songs
 
     def convert_to_string(self) -> str:
         """
         Return a string representation of the playlist specifically intended to be copy-pasted into a spotify playlist.
         The format is 'spotify:track:{track_id}' for each song in the playlist.
+
+        >>> p = Playlist("My Playlist")
+        >>> p.add_song(Song("1", ["Artist1"], "Album1", "Song1", 50, 200000, False, 0.8, 1, 0.05, 0.2, 0.1, 0.9, 120, "Pop"))
+        >>> p.add_song(Song("2", ["Artist2"], "Album2", "Song2", 60, 180000, True, 0.7, 0, 0.1, 0.3, 0.2, 0.8, 130, "Rock"))
+        >>> print(p.convert_to_string())
+        spotify:track:1
+        spotify:track:2
         """
         res = []
         for song_id in self._songs:
@@ -107,7 +114,9 @@ class Playlist:
         pyperclip.paste()
 
     def taste_match(self, other: 'Playlist') -> float:
-        """Return a percentage indicating how similar the taste in music is between two playlists"""
+        """
+        Return a percentage indicating how similar the taste in music is between two playlists
+        """
         if len(self._songs) == 0 or len(other._songs) == 0:
             return 0
 
@@ -135,7 +144,7 @@ class Playlist:
         recommended_songs.sort(key=lambda x: (x[1], x[0].popularity), reverse=True)
         return [x[0] for x in recommended_songs[:limit]]
 
-    def playlist_profile(self):
+    def playlist_profile(self) -> dict:
         """
         Return a dictionary with the 'profile' of the playlist, containing the top genre, average moods, etc.
         (in percentage).
@@ -181,7 +190,13 @@ class Playlist:
         return genre
 
     def _vectorize_song(self, song: Song) -> list[float]:
-        """Return a list of the features of the song, normalized to a value roughly between 0 and 1"""
+        """
+        Return a list of the features of the song, normalized to a value roughly between 0 and 1
+        >>> s = Song("1", ["Artist1"], "Album1", "Song1", 50, 200000, False, 0.8, 1, 0.05, 0.2, 0.1, 0.9, 120, "Pop")
+        >>> p = Playlist("My Playlist")
+        >>> p._vectorize_song(s)
+        [0.8, 1, 0.05, 0.2, 0.1, 0.9, 1.0]
+        """
         return [song.energy, song.mode, song.speechiness, song.acousticness,
                 song.instrumentalness, song.valence, song.tempo / 120]
 
@@ -207,6 +222,14 @@ class Playlist:
         Preconditions:
             - len(vector1) == len(vector2)
             - len(vector1) > 0
+
+        >>> p = Playlist("My Playlist")
+        >>> p._cosine_similarity([1, 0, 0], [0, 1, 0])
+        0.0
+        >>> p._cosine_similarity([1, 0, 0], [1, 0, 0])
+        1.0
+        >>> p._cosine_similarity([1, 0, 0], [0, 0, 1])
+        0.0
         """
         dot_product = sum(vector1[i] * vector2[i] for i in range(len(vector1)))
         norm1 = sum(x**2 for x in vector1) ** 0.5
@@ -217,7 +240,7 @@ class Playlist:
 
         return dot_product / (norm1 * norm2)
 
-    def load_displays(self, screen: any, start_height: int, songs: list[Song], profile: Optional[bool] = None) -> None:
+    def load_displays(self, screen: Any, start_height: int, songs: list[Song], profile: Optional[bool] = None) -> None:
         """Loads the displays"""
         self._displays = {}
         margin = 15
@@ -251,7 +274,7 @@ class Playlist:
 
             self._displays[songs[i].track_id] = Display(pos, rect_dimensions, songs[i], save_button)
 
-    def update_display(self, user: any) -> None:
+    def update_display(self, user: Any) -> None:
         """Updates the displays"""
         for display in self._displays:
             if display in user.playlist.get_songs():
@@ -261,7 +284,7 @@ class Playlist:
                 self._displays[display].button.image = pygame.image.load("assets/unheart.png").convert_alpha()
                 self._displays[display].button.update_image()
 
-    def draw(self, screen: any) -> None:
+    def draw(self, screen: Any) -> None:
         """Draws the displays"""
         for display in self._displays.values():
             display.draw(screen)
@@ -283,20 +306,19 @@ class Display():
     pos: tuple
     dimension: tuple
     song: Song
-    button: any
+    button: Any
 
-    def __init__(self, pos: tuple, dimension: tuple, song: Song, save_button: any) -> None:
+    def __init__(self, pos: tuple, dimension: tuple, song: Song, save_button: Any) -> None:
         self.pos = pos
         self.dimension = dimension
         self.song = song
         self.button = save_button
 
-    def draw(self, screen: any) -> None:
+    def draw(self, screen: Any) -> None:
         """Draws onto the menu"""
         margin = 25
         font_size1 = 20
         font_size2 = 12
-        song_name = ""
         font1 = pygame.font.SysFont("Arial", font_size1)
         font2 = pygame.font.SysFont("Arial", font_size2)
         rect = pygame.Rect(self.pos, self.dimension)
@@ -314,9 +336,7 @@ class Display():
         else:
             song_name = self.song.track_name
 
-        while (font1.size(song_name)[0] > 
-               self.dimension[0] - save_button_size - album_cover_size - margin * 2
-        ):
+        while font1.size(song_name)[0] > self.dimension[0] - save_button_size - album_cover_size - margin * 2:
             font_size1 -= 1
             font1 = pygame.font.SysFont("Arial", font_size1, bold=True)
 
@@ -353,16 +373,15 @@ class Display():
 
 
 class SongManager:
-    """Class to load, parse, and manage the song data
-
-    Instance Attributes:
-    - 
-    """
+    """Class to load, parse, and manage the song data"""
     _song_data_raw: list[dict[str, str]]
     _songs: dict[str, Song]
 
     def __init__(self, file_path: Optional[str] = None) -> None:
-        """"""
+        """
+        Initialize the SongManager with an empty list of raw song data and an empty dictionary of songs. 
+        If a file path is provided, load the data from the file and parse it.
+        """
         self._song_data_raw = []
         self._songs = {}
 
@@ -524,8 +543,10 @@ class Accounts:
             json.dump(account_data, f, indent=2)
 
     def handle_login(self, username: str) -> User | None:
-        """A function to help manage the prompt message for user account info，
-        Return user oject containing user info"""
+        """
+        A function to help manage the prompt message for user account info.
+        Return user object containing user info
+        """
 
         return self.get_account()[username]
 
@@ -566,25 +587,12 @@ class Accounts:
             return error
 
 
-# TEST STUFF
 if __name__ == '__main__':
-    sm = SongManager()
-    sm.load_data_raw('dataset.csv')
-    sm.parse_data()
-
-    playlist1 = Playlist('playlist1')
-    playlist1.add_song(sm.get_song_by_id('5SuOikwiRyPMVoIQDJUgSV'))
-    playlist1.add_song(sm.get_song_by_id('4qPNDBW1i3p13qLCt0Ki3A'))
-    playlist1.add_song(sm.get_song_by_id('4yzs6Ba0GQH55Zo66Q51PS'))
-    playlist2 = Playlist('playlist2')
-    playlist2.add_song(sm.get_song_by_id('6twCOHBycvvQFXJl4CrbvZ'))
-    playlist1.copy_to_clipboard()
-
-    # When you are ready to check your work with python_ta, uncomment the following lines.
-    # (Delete the "#" and space before each line.)
-    # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block
     import python_ta
     python_ta.check_all(config={
         'max-line-length': 120,
         'disable': ['R1705', 'E9998', 'E9999']
     })
+
+    import doctest
+    doctest.testmod()
