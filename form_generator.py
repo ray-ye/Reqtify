@@ -2,11 +2,12 @@
 
 from textbox import TextBox
 from button import Button
+import pygame
 
 
 class Form():
     """Form that generates a form used to fill up information
-    
+
     Instance Attributes:
     - x_pos: position of x
     - y_pos: position of y

@@ -3,7 +3,7 @@ from typing import Optional
 import pygame
 
 
-def hover_effect(position: tuple[int, int], buttons: list[Button]) -> None:
+def hover_effect(position: tuple[int, int], buttons: list) -> None:
     """Check if user is hovering over button and change the button accordingly."""
 
     if any(button.check_hover(position) for button in buttons if button):
@@ -14,10 +14,9 @@ def hover_effect(position: tuple[int, int], buttons: list[Button]) -> None:
 
 class Button():
     """This class initiates button
-    
+
     Instance Attributes:
-    - x_pos: tracks x position of cursor
-    - y_pos: tracks y position of cursor
+    - position: a tuple containing x and y cordinates
     - image: if button has a saved image
     - text_input: if button have text
     - font: font of the text
@@ -31,12 +30,11 @@ class Button():
     - text_rect: rectangle that makes sure text is in the center of the rectangle.
     - rect: rectangle
     """
-    
-    x_pos: tuple
-    y_pos: tuple
+
+    position: tuple
     image: any
     text_input: Optional[str] = None
-    font: Optional[str] = None
+    font: Optional[pygame.Font] = None
     font_size: Optional[int] = None
     font_colour: Optional[tuple] = None
     button_colour: Optional[tuple] = None
@@ -63,7 +61,7 @@ class Button():
         self.text_input = text_input
         self.font_size = font_size
         if font:
-            self.font = pygame.font.SysFont(font, self.font_size, bold=True)
+            self.font = pygame.font.SysFont(text_input, self.font_size, bold=True)
         self.width = button_size[0]
         self.height = button_size[1]
         self.font_colour = font_colour
