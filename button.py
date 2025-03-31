@@ -3,7 +3,7 @@ from typing import Optional
 import pygame
 
 
-def hover_effect(position: tuple[int, int], buttons: list[Button]) -> None:
+def hover_effect(position: tuple[int, int], buttons: list['Button']) -> None:
     """Check if user is hovering over button and change the button accordingly."""
 
     if any(button.check_hover(position) for button in buttons if button):
@@ -34,7 +34,7 @@ class Button():
     
     x_pos: tuple
     y_pos: tuple
-    image: any
+    image: Any
     text_input: Optional[str] = None
     font: Optional[str] = None
     font_size: Optional[int] = None
@@ -43,11 +43,11 @@ class Button():
     radius: Optional[int] = None
     width: float
     height: float
-    text: any
-    text_rect: any
-    rect: any
+    text: Any
+    text_rect: Any
+    rect: Any
 
-    def __init__(self, image: any, pos: tuple[int, int], button_size: tuple[int, int],
+    def __init__(self, image: Any, pos: tuple[int, int], button_size: tuple[int, int],
                  text_input: Optional[str] = None,
                  font: Optional[str] = None,
                  font_size: Optional[int] = None,
@@ -85,7 +85,7 @@ class Button():
             self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
             self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
 
-    def draw(self, screen: any) -> None:
+    def draw(self, screen: Any) -> None:
         """Draws the button onto screen"""
         if self.image:
             screen.blit(self.image, self.rect)
@@ -124,7 +124,7 @@ class Button():
         """Returns width and height"""
         return self.width, self.height
 
-    def change_text(self, new_text: any) -> None:
+    def change_text(self, new_text: Any) -> None:
         """Changes the text"""
         self.text = self.font.render(new_text, True, self.font_colour)
         self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
@@ -135,7 +135,6 @@ class Button():
 
 
 if __name__ == "__main__":
-    # pass
     # When you are ready to check your work with python_ta, uncomment the following lines.
     # (Delete the "#" and space before each line.)
     # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block

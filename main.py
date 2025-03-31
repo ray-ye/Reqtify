@@ -22,6 +22,7 @@ import random
 import pygame
 import pygame_gui
 import sys
+from typing import Optional, Any
 from settings import Settings
 from button import Button, hover_effect
 from textbox import TextBox
@@ -138,7 +139,7 @@ def login_selection() -> None:
         pygame.display.update()
 
 
-def login(register: any) -> None:
+def login(register: Any) -> None:
     """Handler function for the login screen"""
     global cur_user
 

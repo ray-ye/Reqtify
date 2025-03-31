@@ -1,7 +1,7 @@
 """A module that contains classes that will help parse/process datasets"""
 
 from csv import DictReader
-from typing import Optional
+from typing import Optional, Any
 from dataclasses import dataclass
 import json
 import pygame
@@ -63,7 +63,7 @@ class Playlist:
     _songs: dict
     _displays: dict
 
-    def __init__(self, name: str, songs: Optional[dict] = None, ) -> None:
+    def __init__(self, name: str, songs: Optional[dict] = None) -> None:
         """Initializes a playlist object with a name and an empty list of songs"""
         self.name = name
         self._songs = songs if songs is not None else {}  # I changed this to a dict mapping id to song object - R
@@ -217,7 +217,7 @@ class Playlist:
 
         return dot_product / (norm1 * norm2)
 
-    def load_displays(self, screen: any, start_height: int, songs: list[Song], profile: Optional[bool] = None) -> None:
+    def load_displays(self, screen: Any, start_height: int, songs: list[Song], profile: Optional[bool] = None) -> None:
         """Loads the displays"""
         self._displays = {}
         margin = 15
@@ -251,7 +251,7 @@ class Playlist:
 
             self._displays[songs[i].track_id] = Display(pos, rect_dimensions, songs[i], save_button)
 
-    def update_display(self, user: any) -> None:
+    def update_display(self, user: Any) -> None:
         """Updates the displays"""
         for display in self._displays:
             if display in user.playlist.get_songs():
@@ -261,7 +261,7 @@ class Playlist:
                 self._displays[display].button.image = pygame.image.load("assets/unheart.png").convert_alpha()
                 self._displays[display].button.update_image()
 
-    def draw(self, screen: any) -> None:
+    def draw(self, screen: Any) -> None:
         """Draws the displays"""
         for display in self._displays.values():
             display.draw(screen)
@@ -283,15 +283,15 @@ class Display():
     pos: tuple
     dimension: tuple
     song: Song
-    button: any
+    button: Any
 
-    def __init__(self, pos: tuple, dimension: tuple, song: Song, save_button: any) -> None:
+    def __init__(self, pos: tuple, dimension: tuple, song: Song, save_button: Any) -> None:
         self.pos = pos
         self.dimension = dimension
         self.song = song
         self.button = save_button
 
-    def draw(self, screen: any) -> None:
+    def draw(self, screen: Any) -> None:
         """Draws onto the menu"""
         margin = 25
         font_size1 = 20
@@ -566,20 +566,7 @@ class Accounts:
             return error
 
 
-# TEST STUFF
 if __name__ == '__main__':
-    sm = SongManager()
-    sm.load_data_raw('dataset.csv')
-    sm.parse_data()
-
-    playlist1 = Playlist('playlist1')
-    playlist1.add_song(sm.get_song_by_id('5SuOikwiRyPMVoIQDJUgSV'))
-    playlist1.add_song(sm.get_song_by_id('4qPNDBW1i3p13qLCt0Ki3A'))
-    playlist1.add_song(sm.get_song_by_id('4yzs6Ba0GQH55Zo66Q51PS'))
-    playlist2 = Playlist('playlist2')
-    playlist2.add_song(sm.get_song_by_id('6twCOHBycvvQFXJl4CrbvZ'))
-    playlist1.copy_to_clipboard()
-
     # When you are ready to check your work with python_ta, uncomment the following lines.
     # (Delete the "#" and space before each line.)
     # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block

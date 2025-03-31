@@ -1,42 +1,64 @@
 """This is a module that contains a Form class that is responsible for building and executing form opertaions"""
 
+import pygame
 from textbox import TextBox
 from button import Button
+from typing import Optional, Any
 
 
 class Form():
-    """Form that generates a form used to fill up information
-    
+    """
+    A dynamic, self-adjusting form container for user input in Pygame applications.
+
     Instance Attributes:
-    - x_pos: position of x
-    - y_pos: position of y
-    - ui_manager: manager for python_ui (textbox)
-    - rect: rect: the rect object of the form
-    - prompter: a dictionary collection of textbox objects (textbox mapped to song_id)
-    - margin: margin of 120 pixels
-    - padding: padding of 70 pixels
-    - button: the button object of this form
-    - background_colour: background colour of the form
-    - font_size: size of the font
-    - font: font type
-    - error: whether there's an error in the inputs
+    - x_pos (int): Horizontal center position of the form
+    - y_pos (int): Vertical center position of the form
+    - ui_manager (pygame_gui.UIManager): GUI manager for pygame_gui elements
+    - rect (pygame.Rect): The bounding rectangle of the form background
+    - prompter (dict[str, TextBox]): Dictionary mapping labels to TextBox objects
+    - margin (int): Vertical spacing between form elements (default: 120px)
+    - padding (int): Inner padding around form edges (default: 70px)
+    - button (Button): The form's submission button
+    - background_colour (tuple[int, int, int]): RGB color for form background
+    - font_size (int): Font size for field labels
+    - font (pygame.font.Font): Font object for rendering labels
+    - error (bool): Flag indicating if the form contains validation errors
+
+    >>> import pygame
+    >>> import pygame_gui
+    >>> _ = pygame.init()
+    >>> screen = pygame.display.set_mode((800, 600))
+    >>> ui_manager = pygame_gui.UIManager((800, 600))
+    >>> form = Form((400, 300), ui_manager, "Submit", (255, 255, 255), "Arial", 20)
+    >>> form.add_textbox("Username", 200)
+    >>> form.add_textbox("Password", 200)
+    >>> form.draw(screen)
     """
     x_pos: tuple
     y_pos: tuple
-    ui_manager: any
-    rect: any
+    ui_manager: Any
+    rect: Any
     prompter: dict
     margin: int
     padding: int
     button: Button
     background_colour: tuple
-    font_size: any
-    font: any
+    font_size: Any
+    font: Any
     error: bool
 
-    def __init__(
-            self, position: tuple, manager: any, button_text: str, background_colour: tuple, font: any, font_size: int
-    ) -> None:
+    def __init__(self, position: tuple, manager: Any, button_text: str,
+                 background_colour: tuple, font: Any, font_size: int) -> None:
+        """Initialize a new form container.
+
+        Preconditions:
+            - position is a tuple of (x, y) integers within screen bounds
+            - manager is an initialized pygame_gui.UIManager
+            - button_text is a non-empty string
+            - background_colour is a valid RGB tuple
+            - font is a string naming an available system font
+            - font_size is a positive integer
+        """
         self.x_pos = position[0]
         self.y_pos = position[1]
         self.ui_manager = manager
@@ -58,8 +80,14 @@ class Form():
         self.font = pygame.font.SysFont(font, font_size)
         self.error = False
 
-    def add_textbox(self, title: any, width: float) -> None:
-        """Adds text box"""
+    def add_textbox(self, title: Any, width: float) -> None:
+        """Add a new labeled input field to the form.
+
+        Preconditions:
+            - title is a non-empty string
+            - width > 0
+            - The form has enough vertical space to add another field
+        """
         self.rect.width = 300
 
         if len(self.prompter) > 1:
@@ -80,8 +108,14 @@ class Form():
 
         self.prompter[title] = TextBox(position, (width, 45), self.ui_manager, "#" + title.lower().replace(" ", ""),
                                        True)
-    def draw(self, screen: any) -> None:
-        """Draws entire form onto screen"""
+    def draw(self, screen: Any) -> None:
+        """Render all form elements to the specified surface.
+
+        Preconditions:
+            - screen is a valid pygame.Surface
+            - pygame display is initialized
+            - All form elements are properly initialized
+        """
         pygame.draw.rect(screen, self.background_colour, self.rect, border_radius=30)
         self.button.draw(screen)
 
@@ -90,20 +124,20 @@ class Form():
             text = self.font.render(prompter, True, (30, 30, 30))
             screen.blit(text, (textbox.rect.topleft[0], textbox.rect.topleft[1] - 25))
 
-    def get_prompters(self) -> any:
-        """Return all textboxes of the form"""
+    def get_prompters(self) -> Any:
+        """Retrieve all text input fields in the form."""
         return self.prompter.values()
 
-    def error_message(self, message: str, screen: any) -> None:
-        """Displays error message onto screen"""
+    def error_message(self, message: str, screen: Any) -> None:
+        """Display a validation error message below the last form field."""
 
         font = pygame.font.SysFont("Arial", 9)
         text = font.render(message, True, (144, 8, 8))
         text_rect = text.get_rect(center=(self.rect.centerx, list(self.get_prompters())[-1].rect.bottomleft[1] + 20))
         screen.blit(text, text_rect)
 
-    def check_error(self) -> any:
-        """See if there are errors to the inputs of the form"""
+    def check_error(self) -> Any:
+        """Check the form's error state."""
         return self.error
 
 
