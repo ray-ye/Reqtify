@@ -18,6 +18,7 @@ match() outputting result from search
 """
 
 from __future__ import annotations
+from typing import Optional, Any
 import random
 import pygame
 import pygame_gui
@@ -138,7 +139,7 @@ def login_selection() -> None:
         pygame.display.update()
 
 
-def login(register: any) -> None:
+def login(register: Any) -> None:
     """Handler function for the login screen"""
     global cur_user
 

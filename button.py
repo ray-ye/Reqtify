@@ -1,5 +1,5 @@
 """A module that deals with buttons, and mouse hovering over buttons."""
-from typing import Optional
+from typing import Optional, Any
 import pygame
 
 
@@ -13,8 +13,9 @@ def hover_effect(position: tuple[int, int], buttons: list) -> None:
 
 
 class Button():
-    """This class initiates button
-
+    """
+    This class initiates button
+    
     Instance Attributes:
     - position: a tuple containing x and y cordinates
     - image: if button has a saved image
@@ -30,9 +31,8 @@ class Button():
     - text_rect: rectangle that makes sure text is in the center of the rectangle.
     - rect: rectangle
     """
-
     position: tuple
-    image: any
+    image: Any
     text_input: Optional[str] = None
     font: Optional[pygame.Font] = None
     font_size: Optional[int] = None
@@ -41,11 +41,11 @@ class Button():
     radius: Optional[int] = None
     width: float
     height: float
-    text: any
-    text_rect: any
-    rect: any
+    text: Any
+    text_rect: Any
+    rect: Any
 
-    def __init__(self, image: any, pos: tuple[float, float], button_size: tuple[float, float],
+    def __init__(self, image: Any, pos: tuple[float, float], button_size: tuple[float, float],
                  text_input: Optional[str] = None,
                  font: Optional[str] = None,
                  font_size: Optional[int] = None,
@@ -83,7 +83,7 @@ class Button():
             self.image = pygame.transform.smoothscale(self.image, (self.width, self.height))
             self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
 
-    def draw(self, screen: any) -> None:
+    def draw(self, screen: Any) -> None:
         """Draws the button onto screen"""
         if self.image:
             screen.blit(self.image, self.rect)
@@ -122,7 +122,7 @@ class Button():
         """Returns width and height"""
         return self.width, self.height
 
-    def change_text(self, new_text: any) -> None:
+    def change_text(self, new_text: str) -> None:
         """Changes the text"""
         self.text = self.font.render(new_text, True, self.font_colour)
         self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
@@ -133,12 +133,11 @@ class Button():
 
 
 if __name__ == "__main__":
-    # pass
-    # When you are ready to check your work with python_ta, uncomment the following lines.
-    # (Delete the "#" and space before each line.)
-    # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block
     import python_ta
     python_ta.check_all(config={
         'max-line-length': 120,
         'disable': ['R1705', 'E9998', 'E9999']
     })
+
+    import doctest
+    doctest.testmod()

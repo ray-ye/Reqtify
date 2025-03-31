@@ -1,4 +1,5 @@
 """This module contains a data class for the app"""
+from typing import Any
 import pygame
 
 
@@ -11,11 +12,10 @@ class Settings:
     - SCREEN_HEIGHT: Height of screen
     - BACKGROUND_COLOUR: background colour
     """
-    display_info: any
+    display_info: Any
     SCREEN_HEIGHT: float
     SCREEN_WIDTH: float
     BACKGROUND_COLOUR: tuple
-    # lowercase because pythonTA complaining
     pygame.init()
     display_info = pygame.display.Info()
 
@@ -31,3 +31,6 @@ if __name__ == '__main__':
         'max-line-length': 120,
         'disable': ['R1705', 'E9998', 'E9999']
     })
+
+    import doctest
+    doctest.testmod()

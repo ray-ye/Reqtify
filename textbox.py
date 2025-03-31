@@ -1,4 +1,5 @@
 """This module is for creating text boxes"""
+from typing import Any
 import pygame_gui
 import pygame
 
@@ -19,11 +20,11 @@ class TextBox():
     y_pos: tuple
     width: float
     height: float
-    manager: any
-    object_id: any
-    rect: any
+    manager: Any
+    object_id: Any
+    rect: Any
 
-    def __init__(self, position: tuple, dimension: tuple, manager: any, object_id: any, center: any) -> None:
+    def __init__(self, position: tuple, dimension: tuple, manager: Any, object_id: Any, center: Any) -> None:
         self.x_pos = position[0]
         self.y_pos = position[1]
         self.width = dimension[0]
@@ -52,7 +53,7 @@ class TextBox():
         """Returns top left of rectangle"""
         return self.rect.topleft
 
-    def get_id(self) -> any:
+    def get_id(self) -> Any:
         """Returns id"""
         return self.object_id
 
