@@ -1,10 +1,8 @@
 """This module contains a data class for the app"""
 from typing import Any
 import pygame
-from dataclasses import dataclass
 
 
-@dataclass
 class Settings:
     """A settings data class storing all settings attributes for the app
 
