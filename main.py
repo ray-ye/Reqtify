@@ -716,7 +716,6 @@ def profile():
         screen.blit(text2, text2_rect)
         pygame.display.update()
 
-
         # check for user input
         for event in pygame.event.get():
 
@@ -734,7 +733,8 @@ def profile():
                         pass
 
                     if up_button.check_hover(mouse_pos):
-                        if list(cur_user.playlist.get_displays().values())[0].song != song_holder[0]:
+                        displays = cur_user.playlist.get_displays()
+                        if len(displays) > 0 and list(displays.values())[0].song != song_holder[0]:
                             display_start_row -= 1
                             cur_user.playlist.load_displays(screen, 150, song_holder[display_start_row:], True)
                             cur_user.playlist.update_display(cur_user)
