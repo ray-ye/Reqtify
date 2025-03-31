@@ -6,10 +6,10 @@ class DecisionTree:
     _root: Optional[Any]
     _subtrees: list['DecisionTree']
 
-    def __init__(self, root: Any, subtrees: list) -> None:
+    def __init__(self, root: Any, subtrees: list['DecisionTree']=[]) -> None:
         """Initialize a new decision tree."""
         self._root = root
-        self._subtrees = []
+        self._subtrees = subtrees
 
     def is_empty(self) -> bool:
         """Return whether this tree is empty.
@@ -63,7 +63,17 @@ class DecisionTree:
             return False
     
     def insert_sequence(self, items: list) -> None:
-        """Insert the given sequence of items into this tree."""
+        """
+        Insert the given sequence of items into this tree.
+
+        >>> t = DecisionTree('', [])
+        >>> t.insert_sequence([1, 2, 3])
+        >>> len(t)
+        4
+        >>> t.insert_sequence([1, 2, 4])
+        >>> len(t)
+        5
+        """
         cursor = self
         for item in items:
             for subtree in cursor._subtrees:
@@ -74,8 +84,18 @@ class DecisionTree:
                 cursor._subtrees.append(DecisionTree(item, []))
                 cursor = cursor._subtrees[-1]
         
-    def children(self, path: list[bool]) -> list[str]:
-        """Return the children of this tree that match the given path."""
+    def children(self, path: list[bool]) -> list:
+        """
+        Return the children of this tree that match the given path.
+
+        >>> t = DecisionTree(1, [DecisionTree(2, []), DecisionTree(3, [])])
+        >>> t.insert_sequence([1, 2, 3])
+        >>> t.insert_sequence([1, 2, 4])
+        >>> t.children([1, 2])
+        [3, 4]
+        >>> t.children([1, 3])
+        []
+        """
         cursor = self
         for item in path:
             for subtree in cursor._subtrees:
@@ -85,7 +105,7 @@ class DecisionTree:
             else:
                 return []
 
-        return [str(subtree._root) for subtree in cursor._subtrees]
+        return [subtree._root for subtree in cursor._subtrees]
 
     def build_tree(self, file_path: str) -> None:
         """Build a decision tree from the given data."""
@@ -97,11 +117,12 @@ class DecisionTree:
         for row in data:
             self.insert_sequence(row)
     
-# test the tree
-if __name__ == '__main__':
-    tree = DecisionTree(None, [])
-    tree.build_tree('songs.csv')
-    print(len(tree.children([True,False,False,False,True,True,False,True,False,False])))
 
-    for i in tree.children([True,False,False,False,True,True,False,True,False,False]):
-        print('spotify:track:' + i)
+if __name__ == '__main__':
+    tree = DecisionTree('', [])
+    tree.build_tree('songs.csv')
+    songs = tree.children([True,False,False,False,True,True,False,True,False,False])
+    print(songs)
+
+    import doctest
+    doctest.testmod()
