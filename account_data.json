@@ -18,5 +18,9 @@
   "ray": {
     "password": "11111",
     "playlist": []
+  },
+  "test4": {
+    "password": "11111",
+    "playlist": []
   }
 }

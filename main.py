@@ -1,12 +1,20 @@
+"""CSC111 Project 2: Reqtify Main
+
+This is where modules are utilizaed and pygame graphics are drawn. Each screen of the app has been broken into a
+respective handler function.
+
+login_selection(): screen for selecting login or register
+login(): screen for user to fill out a login/register form
+main(): this is where user is prompted to enter their description of a music playlist
+output(): the input get parsed and entered into a decision_tree for filtration
+
+"""
+
 from __future__ import annotations
-import json
 import random
 import pygame
 import pygame_gui
 import sys
-from typing import Optional
-
-
 from settings import Settings
 from button import Button, hover_effect
 from textbox import TextBox
@@ -15,39 +23,40 @@ from data_manager import Playlist, Song, User, Accounts, SongManager
 from feature_guesser import MusicFeatureGuesser
 from decision_tree import DecisionTree
 
-# Initializing objects / variables
-accounts = Accounts('account_data.json')
-account_list = accounts.get_account()
-cur_user = account_list["init"]
+# ------------------ Initializing objects / variables ------------------
+
+# Pygame utills
 pygame.font.init()
-
-ICON = pygame.image.load("assets/small_logo.png")
-pygame.display.set_icon(ICON)
-
+CLOCK = pygame.time.Clock()
 screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
 ui_manager = pygame_gui.UIManager((screen.get_width(), screen.get_height()), "theme.json")
 
+# Constructing account obj and initializing cur_user
+accounts = Accounts('account_data.json')
+account_list = accounts.get_account()
+cur_user = account_list["init"]
 
-CLOCK = pygame.time.Clock()
-
-big_logo = pygame.image.load("assets/big_logo.png").convert_alpha()
-big_logo = pygame.transform.smoothscale(big_logo, (pygame.image.load("assets/compute_button.png").get_width(),
-                                                   pygame.image.load("assets/compute_button.png").get_height()))
-
-big_logo_rect = big_logo.get_rect(center=(screen.get_width() / 2, screen.get_height() / 2 - 140))
-
-#  User input parsing
+# Construct user input parsing tool
 guesser = MusicFeatureGuesser("reference_data.csv")
 tolerance = 5
 
-# song manager
+# Song manager
 song_manager = SongManager()
 song_manager.load_data_raw("dataset.csv")
 song_manager.parse_data()
 
-# decision Tree
+# Decision Tree
 decision_tree = DecisionTree(None, [])
 decision_tree.build_tree("songs.csv")
+
+# Loading images
+ICON = pygame.image.load("assets/small_logo.png")
+pygame.display.set_icon(ICON)
+big_logo = pygame.image.load("assets/big_logo.png").convert_alpha()
+big_logo = pygame.transform.smoothscale(big_logo, (pygame.image.load("assets/compute_button.png").get_width(),
+                                                   pygame.image.load("assets/compute_button.png").get_height()))
+# creating image rect
+big_logo_rect = big_logo.get_rect(center=(screen.get_width() / 2, screen.get_height() / 2 - 140))
 
 
 # main menu
