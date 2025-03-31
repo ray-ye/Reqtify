@@ -751,7 +751,7 @@ def search(cur_user) -> None:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if search_button.check_hover(mouse_pos):
                     if user_input2 in account_list:
-                        match(account_list[user_input2])  # pass user input into a parsing function
+                        match(cur_user, account_list[user_input2])  # pass user input into a parsing function
 
                     else:
                         error_message = "User not found, please try again."
