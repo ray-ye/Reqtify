@@ -37,5 +37,5 @@ if __name__ == '__main__':
         'disable': ['R1705', 'E9998', 'E9999']
     })
 
-    import doctests
+    import doctest
     doctest.testmod()
