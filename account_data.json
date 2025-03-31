@@ -1,54 +1,22 @@
 {
   "init": {
     "password": "init",
-    "playlist": [
-      "6Vc5wAMmXdKIAM7WUoEb7N",
-      "7k9GuJYLp2AzqokyEdwEw2",
-      "0X9MxHR1rTkEHDjp95F2OO"
-    ]
+    "playlist": []
   },
   "test1": {
-    "password": "12345",
-    "playlist": [
-      "6Vc5wAMmXdKIAM7WUoEb7N",
-      "7k9GuJYLp2AzqokyEdwEw2",
-      "0X9MxHR1rTkEHDjp95F2OO",
-      "2X5AFygz5SDYlXagyPw8kX",
-      "4x7AdVDV9IFWp8pg4LMz90",
-      "1dcNEEtODRVZEevQ20Cgmy",
-      "6huS9u0BDfeQHq0lObNLPl",
-      "14NiShC5b46yQxBN1mu9VJ",
-      "3DyhwZyBFedvnt68fMi6vf",
-      "6kRZfOZSuoi0Htg6gROKDz",
-      "5e9DrLUUZraUE7mmniufjn",
-      "2z3HKlpENvfz1Am2MNF2pL",
-      "33JX2be3eKVhl5xk8YQhVc",
-      "29Ns3avs48iQhNQgrHMEkm",
-      "2XDxQ3VzovLzh60zgOaNEi",
-      "0J4sK2VO75cRSVoj0FokQn",
-      "7bpR5j22mNID1pXwgRcZP1",
-      "1U1GtaJeYwGsPgqV9Me5bb",
-      "2dS2710jYUM8gE2V1KC3uG",
-      "4GiLKZ6Fd3d5UMJMGuzAA0",
-      "0MjXRAftpVBuNGYsNV1obJ",
-      "2O16qeSdWeec3Kte6TKW9p",
-      "1W5j84OLhShyEIJEwaLzaU",
-      "3KAQ4xe2sR6IiltZw8HSA5",
-      "60wxK3idlzc3lykP8cYZ2l",
-      "2O7FC4XbIrJ6Ib8bsq0FYC",
-      "1CYBnHYYbOAsuDCGa0zrw0",
-      "1ytsxlw6P6gsCc3RrYweyj",
-      "37bc0lXXN8Udi7IPwL58Hn",
-      "5IGYPdHMSG4PLXDS9LDPJS",
-      "53iFMaNUXn6Oj8hUIKSO5a",
-      "68KCwQ2PNKNT17sEx32DEG"
-    ]
+    "password": "11111",
+    "playlist": []
   },
   "test2": {
-    "password": "12345",
-    "playlist": [
-      "6Vc5wAMmXdKIAM7WUoEb7N",
-      "7k9GuJYLp2AzqokyEdwEw2",
-      "0X9MxHR1rTkEHDjp95F2OO"]
+    "password": "11111",
+    "playlist": []
+  },
+  "test3": {
+    "password": "11111",
+    "playlist": []
+  },
+  "ray": {
+    "password": "11111",
+    "playlist": []
   }
 }

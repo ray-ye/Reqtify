@@ -91,7 +91,7 @@ class Playlist:
         for song_id in self._songs:
             res.append(f'spotify:track:{song_id}')
         return '\n'.join(res)
-    
+
     def copy_to_clipboard(self) -> None:
         """Copy the playlist to the clipboard"""
         pyperclip.copy(self.convert_to_string())
@@ -100,7 +100,7 @@ class Playlist:
     def taste_match(self, other: 'Playlist') -> float:
         """Return a percentage indicating how similar the taste in music is between two playlists"""
         if len(self._songs) == 0 or len(other._songs) == 0:
-            return -1
+            return 0
 
         vector1 = self._vectorize_playlist()
         vector2 = other._vectorize_playlist()
@@ -127,23 +127,28 @@ class Playlist:
         return [x[0] for x in recommended_songs[:limit]]
 
     def playlist_profile(self):
-        """Return a dictionary with the 'profile' of the playlist, containing the top genre, average moods, etc."""
+        """Return a dictionary with the 'profile' of the playlist, containing the top genre, average moods, etc.
+        (in percentage)"""
         top_genre = self._top_genre()
         avg_energy, _, _, avg_acousticness, avg_instrumentalness, avg_valence, _ = self._vectorize_playlist()
 
         res = {
-            'top_genre': top_genre,
-            'avg_energy': avg_energy,
-            'avg_acousticness': avg_acousticness,
-            'avg_instrumentalness': avg_instrumentalness,
-            'avg_happiness': avg_valence
+            'Top genre': top_genre,
+            'Avg energy': round(avg_energy * 100, 2),
+            'Avg acousticness': round(avg_acousticness * 100, 2),
+            'Avg instrumentalness': round(avg_instrumentalness * 100, 2),
+            'Avg happiness': round(avg_valence * 100, 2)
         }
         return res
 
     def _top_genre(self) -> str:
         """Return the top genre in the playlist"""
         genre_count = {}
-        for song in self._songs:
+
+        if not self._songs:
+            return "[Empty]"
+
+        for song in self._songs.values():
             genre = song.track_genre
             if genre not in genre_count:
                 genre_count[genre] = 0
@@ -196,7 +201,7 @@ class Playlist:
 
         return dot_product / (norm1 * norm2)
 
-    def load_displays(self, screen, start_height, songs: list[Song]) -> None:
+    def load_displays(self, screen, start_height, songs: list[Song], profile: Optional[bool] = None) -> None:
         self._displays = {}
         margin = 15
         button_margin = 25
@@ -206,11 +211,16 @@ class Playlist:
         save_button_size = rect_dimensions[1] - 40
 
         for i in range(len(songs)):
-            if (i + 1) % 2 == 0 and not pos[1] + rect_dimensions[1] + margin > max_height:
-                pos = (margin * 2 + rect_dimensions[0], pos[1])
-
-            elif i == 0:
+            if i == 0:
                 pos = (margin, pos[1])
+
+            elif profile:
+                pos = (margin, pos[1] + rect_dimensions[1] + margin)
+                if pos[1] + rect_dimensions[1] + margin > max_height:
+                    return
+
+            elif (i + 1) % 2 == 0 and not pos[1] + rect_dimensions[1] + margin > max_height:
+                pos = (margin * 2 + rect_dimensions[0], pos[1])
 
             else:
                 pos = (margin, pos[1] + rect_dimensions[1] + margin)
@@ -243,7 +253,6 @@ class Playlist:
         return self._displays
 
 
-
 class Display():
 
     def __init__(self, pos, dimension, song: Song, save_button):
@@ -256,6 +265,7 @@ class Display():
         margin = 25
         font_size1 = 20
         font_size2 = 12
+        song_name = ""
         font1 = pygame.font.SysFont("Arial", font_size1)
         font2 = pygame.font.SysFont("Arial", font_size2)
         rect = pygame.Rect(self.pos, self.dimension)
@@ -264,11 +274,16 @@ class Display():
         album_cover_size = self.dimension[1] - 10
 
         if len(self.song.artists) > 2:
-            artists = ', '.join(self.song.artists[:2]) + " & more"
+            artists = ', '.join(self.song.artists[:2]) + ",..."
         else:
             artists = ', '.join(self.song.artists)
 
-        while font1.size(self.song.track_name)[0] > self.dimension[0] - save_button_size - album_cover_size - margin * 2:
+        if len(self.song.track_name) > 50:
+            song_name = self.song.track_name[: 50] + "..."
+        else:
+            song_name = self.song.track_name
+
+        while font1.size(song_name)[0] > self.dimension[0] - save_button_size - album_cover_size - margin * 2:
             font_size1 -= 1
             font1 = pygame.font.SysFont("Arial", font_size1, bold=True)
 
@@ -282,8 +297,7 @@ class Display():
                              (self.pos[0] + album_cover_size / 2 + margin - 20, self.pos[1] + self.dimension[1] / 2),
                              (album_cover_size, album_cover_size))
 
-
-        text1 = font1.render(self.song.track_name, True, (30, 30, 30))
+        text1 = font1.render(song_name, True, (30, 30, 30))
         text2 = font2.render(artists, True, (30, 30, 30))
 
         text1_rect = text1.get_rect(topleft=(album_cover.get_pos()[0] + album_cover_size / 2 + margin - 15, self.pos[1] + margin - 12))
@@ -297,7 +311,6 @@ class Display():
 
     def set_pos(self, pos):
         self.pos = pos
-
 
 
 class SongManager:
