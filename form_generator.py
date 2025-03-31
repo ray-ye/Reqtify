@@ -19,7 +19,7 @@ class Form():
                              "Arial",
                              35,
                              (30, 30, 30),
-                             (112, 191, 119),
+                             (217, 217, 217),
                              35)
         self.background_colour = background_colour
         self.font_size = font_size
