@@ -25,8 +25,10 @@ class MusicFeatureGuesser:
         """Initializes the MusicFeatureGuesser class"""
         # algorithm:
         # look at the sentences -> vectorize, keep track of the features for each sentence
-        # uesr input -> vectorize -> find similarity with the sentences 
-        # -> get features that are common with similar sentences
+        # user input ->
+        # vectorize ->
+        # find similarity with the sentences ->
+        # get features that are common with similar sentence
         # return the boolean values for the features
         self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
         self.features = []

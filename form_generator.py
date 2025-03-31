@@ -1,5 +1,5 @@
-"""This module generates the forms that will be used"""
-import pygame
+"""This is a module that contains a Form class that is responsible for building and executing form opertaions"""
+
 from textbox import TextBox
 from button import Button
 
@@ -10,16 +10,16 @@ class Form():
     Instance Attributes:
     - x_pos: position of x
     - y_pos: position of y
-    - ui_manager: manages ui
-    - rect: creates a rectange
-    - prompter: prompter that takes in dict
+    - ui_manager: manager for python_ui (textbox)
+    - rect: rect: the rect object of the form
+    - prompter: a dictionary collection of textbox objects (textbox mapped to song_id)
     - margin: margin of 120 pixels
     - padding: padding of 70 pixels
-    - button: a pressable button
-    - background_colour: background colour
+    - button: the button object of this form
+    - background_colour: background colour of the form
     - font_size: size of the font
     - font: font type
-    - error: if there is error
+    - error: whether there's an error in the inputs
     """
     x_pos: tuple
     y_pos: tuple
@@ -51,7 +51,7 @@ class Form():
                              "Arial",
                              35,
                              (30, 30, 30),
-                             (112, 191, 119),
+                             (217, 217, 217),
                              35)
         self.background_colour = background_colour
         self.font_size = font_size
@@ -80,31 +80,30 @@ class Form():
 
         self.prompter[title] = TextBox(position, (width, 45), self.ui_manager, "#" + title.lower().replace(" ", ""),
                                        True)
-
     def draw(self, screen: any) -> None:
-        """Draws"""
-        counter = 1
+        """Draws entire form onto screen"""
         pygame.draw.rect(screen, self.background_colour, self.rect, border_radius=30)
         self.button.draw(screen)
+
         for prompter in self.prompter:
             textbox = self.prompter[prompter]
             text = self.font.render(prompter, True, (30, 30, 30))
             screen.blit(text, (textbox.rect.topleft[0], textbox.rect.topleft[1] - 25))
-            counter += 1
 
     def get_prompters(self) -> any:
-        """Returns prompt"""
+        """Return all textboxes of the form"""
         return self.prompter.values()
 
     def error_message(self, message: str, screen: any) -> None:
-        """Displays error message"""
+        """Displays error message onto screen"""
+
         font = pygame.font.SysFont("Arial", 9)
         text = font.render(message, True, (144, 8, 8))
         text_rect = text.get_rect(center=(self.rect.centerx, list(self.get_prompters())[-1].rect.bottomleft[1] + 20))
         screen.blit(text, text_rect)
 
     def check_error(self) -> any:
-        """Returns error"""
+        """See if there are errors to the inputs of the form"""
         return self.error
 
 
