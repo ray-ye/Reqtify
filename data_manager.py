@@ -88,13 +88,20 @@ class Playlist:
             self._songs[song.track_id] = song
 
     def get_songs(self) -> dict:
-        """Return the list of songs in the playlist"""
+        """Return a dictionary mapping of songs in the playlist"""
         return self._songs
 
     def convert_to_string(self) -> str:
         """
         Return a string representation of the playlist specifically intended to be copy-pasted into a spotify playlist.
         The format is 'spotify:track:{track_id}' for each song in the playlist.
+
+        >>> p = Playlist("My Playlist")
+        >>> p.add_song(Song("1", ["Artist1"], "Album1", "Song1", 50, 200000, False, 0.8, 1, 0.05, 0.2, 0.1, 0.9, 120, "Pop"))
+        >>> p.add_song(Song("2", ["Artist2"], "Album2", "Song2", 60, 180000, True, 0.7, 0, 0.1, 0.3, 0.2, 0.8, 130, "Rock"))
+        >>> print(p.convert_to_string())
+        spotify:track:1
+        spotify:track:2
         """
         res = []
         for song_id in self._songs:
@@ -107,7 +114,9 @@ class Playlist:
         pyperclip.paste()
 
     def taste_match(self, other: 'Playlist') -> float:
-        """Return a percentage indicating how similar the taste in music is between two playlists"""
+        """
+        Return a percentage indicating how similar the taste in music is between two playlists
+        """
         if len(self._songs) == 0 or len(other._songs) == 0:
             return 0
 
@@ -181,7 +190,13 @@ class Playlist:
         return genre
 
     def _vectorize_song(self, song: Song) -> list[float]:
-        """Return a list of the features of the song, normalized to a value roughly between 0 and 1"""
+        """
+        Return a list of the features of the song, normalized to a value roughly between 0 and 1
+        >>> s = Song("1", ["Artist1"], "Album1", "Song1", 50, 200000, False, 0.8, 1, 0.05, 0.2, 0.1, 0.9, 120, "Pop")
+        >>> p = Playlist("My Playlist")
+        >>> p._vectorize_song(s)
+        [0.8, 1, 0.05, 0.2, 0.1, 0.9, 1.0]
+        """
         return [song.energy, song.mode, song.speechiness, song.acousticness,
                 song.instrumentalness, song.valence, song.tempo / 120]
 
@@ -207,6 +222,14 @@ class Playlist:
         Preconditions:
             - len(vector1) == len(vector2)
             - len(vector1) > 0
+
+        >>> p = Playlist("My Playlist")
+        >>> p._cosine_similarity([1, 0, 0], [0, 1, 0])
+        0.0
+        >>> p._cosine_similarity([1, 0, 0], [1, 0, 0])
+        1.0
+        >>> p._cosine_similarity([1, 0, 0], [0, 0, 1])
+        0.0
         """
         dot_product = sum(vector1[i] * vector2[i] for i in range(len(vector1)))
         norm1 = sum(x**2 for x in vector1) ** 0.5
@@ -350,16 +373,15 @@ class Display():
 
 
 class SongManager:
-    """Class to load, parse, and manage the song data
-
-    Instance Attributes:
-    - 
-    """
+    """Class to load, parse, and manage the song data"""
     _song_data_raw: list[dict[str, str]]
     _songs: dict[str, Song]
 
     def __init__(self, file_path: Optional[str] = None) -> None:
-        """"""
+        """
+        Initialize the SongManager with an empty list of raw song data and an empty dictionary of songs. 
+        If a file path is provided, load the data from the file and parse it.
+        """
         self._song_data_raw = []
         self._songs = {}
 
@@ -521,8 +543,10 @@ class Accounts:
             json.dump(account_data, f, indent=2)
 
     def handle_login(self, username: str) -> User | None:
-        """A function to help manage the prompt message for user account info，
-        Return user oject containing user info"""
+        """
+        A function to help manage the prompt message for user account info.
+        Return user oject containing user info
+        """
 
         return self.get_account()[username]
 
@@ -564,11 +588,11 @@ class Accounts:
 
 
 if __name__ == '__main__':
-    # When you are ready to check your work with python_ta, uncomment the following lines.
-    # (Delete the "#" and space before each line.)
-    # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block
     import python_ta
     python_ta.check_all(config={
         'max-line-length': 120,
         'disable': ['R1705', 'E9998', 'E9999']
     })
+
+    import doctest
+    doctest.testmod()

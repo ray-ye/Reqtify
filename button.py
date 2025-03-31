@@ -4,7 +4,12 @@ import pygame
 
 
 def hover_effect(position: tuple[int, int], buttons: list['Button']) -> None:
-    """Check if user is hovering over button and change the button accordingly."""
+    """
+    Check if user is hovering over button and change the button accordingly.
+    
+    Preconditions:
+        - position is a tuple of (x, y) integers within screen bounds
+    """
 
     if any(button.check_hover(position) for button in buttons if button):
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
@@ -13,7 +18,8 @@ def hover_effect(position: tuple[int, int], buttons: list['Button']) -> None:
 
 
 class Button():
-    """This class initiates button
+    """
+    This class initiates button
     
     Instance Attributes:
     - x_pos: tracks x position of cursor
@@ -124,7 +130,7 @@ class Button():
         """Returns width and height"""
         return self.width, self.height
 
-    def change_text(self, new_text: Any) -> None:
+    def change_text(self, new_text: str) -> None:
         """Changes the text"""
         self.text = self.font.render(new_text, True, self.font_colour)
         self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
@@ -135,11 +141,11 @@ class Button():
 
 
 if __name__ == "__main__":
-    # When you are ready to check your work with python_ta, uncomment the following lines.
-    # (Delete the "#" and space before each line.)
-    # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block
     import python_ta
     python_ta.check_all(config={
         'max-line-length': 120,
         'disable': ['R1705', 'E9998', 'E9999']
     })
+
+    import doctest
+    doctest.testmod()

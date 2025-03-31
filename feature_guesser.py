@@ -87,3 +87,6 @@ if __name__ == '__main__':
         'max-line-length': 120,
         'disable': ['R1705', 'E9998', 'E9999']
     })
+
+    import doctest
+    doctest.testmod()

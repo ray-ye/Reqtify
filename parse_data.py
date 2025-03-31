@@ -1,4 +1,4 @@
-"""This module is used to parse data"""
+"""This module is used to parse the dataset and create a new CSV file with relevant features."""
 import csv
 
 rows = []
@@ -26,7 +26,6 @@ with open('songs.csv', 'w', newline='') as file:
         'is_loud', 'is_major', 'is_danceable', 'is_live', 'is_fast'
     ])
     writer.writeheader()
-
     writer.writerows(rows)
 
 
@@ -37,3 +36,6 @@ if __name__ == '__main__':
         'max-line-length': 120,
         'disable': ['R1705', 'E9998', 'E9999']
     })
+
+    import doctests
+    doctest.testmod()
