@@ -1,10 +1,12 @@
 """This module contains a data class for the app"""
 import pygame
+from dataclasses import dataclass
 
 
+@dataclass
 class Settings:
     """A settings data class storing all settings attributes for the app
-    
+
     Instance Attributes:
     - display_info: information on display
     - SCREEN_WIDTH: width of screen

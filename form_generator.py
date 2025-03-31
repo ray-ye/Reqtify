@@ -5,8 +5,8 @@ from button import Button
 import pygame
 
 
-class Form():
-    """Form that generates a form used to fill up information
+class Form:
+    """Form that generates a form used to collect data
 
     Instance Attributes:
     - x_pos: position of x
@@ -22,8 +22,8 @@ class Form():
     - font: font type
     - error: whether there's an error in the inputs
     """
-    x_pos: tuple
-    y_pos: tuple
+    x_pos: float
+    y_pos: float
     ui_manager: any
     rect: any
     prompter: dict
@@ -36,8 +36,15 @@ class Form():
     error: bool
 
     def __init__(
-            self, position: tuple, manager: any, button_text: str, background_colour: tuple, font: any, font_size: int
+            self,
+            position: tuple[float, float],
+            manager: any,
+            button_text: str,
+            background_colour: tuple,
+            font: any,
+            font_size: int
     ) -> None:
+
         self.x_pos = position[0]
         self.y_pos = position[1]
         self.ui_manager = manager
@@ -81,6 +88,7 @@ class Form():
 
         self.prompter[title] = TextBox(position, (width, 45), self.ui_manager, "#" + title.lower().replace(" ", ""),
                                        True)
+
     def draw(self, screen: any) -> None:
         """Draws entire form onto screen"""
         pygame.draw.rect(screen, self.background_colour, self.rect, border_radius=30)

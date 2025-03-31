@@ -3,9 +3,9 @@ import pygame_gui
 import pygame
 
 
-class TextBox():
+class TextBox:
     """Creates text boxes
-    
+
     Instance Attributes:
     - x_pos: position of x
     - y_pos: position of y
@@ -15,12 +15,12 @@ class TextBox():
     - object_id: id of object
     - rect: rectangle
     """
-    x_pos: tuple
-    y_pos: tuple
+    x_pos: float
+    y_pos: float
     width: float
     height: float
     manager: any
-    object_id: any
+    object_id: str
     rect: any
 
     def __init__(self, position: tuple, dimension: tuple, manager: any, object_id: any, center: any) -> None:

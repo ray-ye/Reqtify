@@ -19,9 +19,10 @@ match() outputting result from search
 
 from __future__ import annotations
 import random
+import sys
+import python_ta
 import pygame
 import pygame_gui
-import sys
 from settings import Settings
 from button import Button, hover_effect
 from textbox import TextBox
@@ -30,48 +31,21 @@ from data_manager import Playlist, Accounts, SongManager
 from feature_guesser import MusicFeatureGuesser
 from decision_tree import DecisionTree
 
-# ====================== Initializing objects / variables ======================
-
-# Pygame utills
-pygame.font.init()
-CLOCK = pygame.time.Clock()
-screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
-ui_manager = pygame_gui.UIManager((screen.get_width(), screen.get_height()), "theme.json")
-
-# Constructing account obj and initializing cur_user
-accounts = Accounts('account_data.json')
-account_list = accounts.get_account()
-cur_user = account_list["init"]
-
-# Construct user input parsing tool
-guesser = MusicFeatureGuesser("reference_data.csv")
-tolerance = 5
-
-# Song manager
-song_manager = SongManager()
-song_manager.load_data_raw("dataset.csv")
-song_manager.parse_data()
-
-# Decision Tree
-decision_tree = DecisionTree(None, [])
-decision_tree.build_tree("songs.csv")
-
-# Loading images
-ICON = pygame.image.load("assets/small_logo.png")
-pygame.display.set_icon(ICON)
-big_logo = pygame.image.load("assets/big_logo.png").convert_alpha()
-big_logo = pygame.transform.smoothscale(big_logo, (pygame.image.load("assets/compute_button.png").get_width(),
-                                                   pygame.image.load("assets/compute_button.png").get_height()))
-# creating image rect
-big_logo_rect = big_logo.get_rect(center=(screen.get_width() / 2, screen.get_height() / 2 - 140))
-
+ACCOUNTS = Accounts('account_data.json')
 
 # ====================== Login selection ======================
 def login_selection() -> None:
     """Handler function for the login screen of the app"""
-    global screen
-
+    pygame.font.init()
+    screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
     pygame.display.set_caption("Reqtify Login")
+    icon = pygame.image.load("assets/small_logo.png")
+    pygame.display.set_icon(icon)
+    big_logo = pygame.image.load("assets/big_logo.png").convert_alpha()
+    big_logo = pygame.transform.smoothscale(big_logo, (pygame.image.load("assets/compute_button.png").get_width(),
+                                                       pygame.image.load("assets/compute_button.png").get_height()))
+    # creating image rect
+    big_logo_rect = big_logo.get_rect(center=(screen.get_width() / 2, screen.get_height() / 2 - 140))
 
     # button settings
     button_margin = 140
@@ -124,23 +98,29 @@ def login_selection() -> None:
 
         # check for user input
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT:  # noqa: E1101
                 pygame.quit()
                 sys.exit()
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if login_button.check_hover(mouse_pos):
-                    login(register=False)
+            if event.type == pygame.MOUSEBUTTONDOWN and login_button.check_hover(mouse_pos):
+                login(register=False)
 
-                if register_button.check_hover(mouse_pos):
-                    login(register=True)
+            elif event.type == pygame.MOUSEBUTTONDOWN and register_button.check_hover(mouse_pos):
+                login(register=True)
 
         pygame.display.update()
 
 
 def login(register: any) -> None:
     """Handler function for the login screen"""
-    global cur_user
+    # Constructing account obj and initializing cur_user
+    account_list = ACCOUNTS.get_account()
+    cur_user = account_list["init"]
+
+    pygame.font.init()
+    clock = pygame.time.Clock()
+    screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
+    ui_manager = pygame_gui.UIManager((screen.get_width(), screen.get_height()), "theme.json")
 
     # initialize neceesary variables
     username = ""
@@ -175,7 +155,7 @@ def login(register: any) -> None:
         # necessities
         screen.fill(Settings.BACKGROUND_COLOUR)
         mouse_pos = pygame.mouse.get_pos()
-        refresh_rate = CLOCK.tick(60)/1000
+        refresh_rate = clock.tick(60) / 1000
         ui_manager.update(refresh_rate)
         hover_effect(mouse_pos, [login_form.button])
 
@@ -213,18 +193,18 @@ def login(register: any) -> None:
                 if register:
                     error_message = ""
 
-                    if accounts.error(username, password, re_password):
+                    if ACCOUNTS.error(username, password, re_password):
                         login_form.error = True
-                        error_message = accounts.error(username, password, re_password, True)
+                        error_message = ACCOUNTS.error(username, password, re_password, True)
 
                     else:
-                        accounts.register(username, password)
+                        ACCOUNTS.register(username, password)
                         cur_user = account_list[username]
-                        main_menu()
+                        main_menu(cur_user)
 
-                elif accounts.login(username, password):
+                elif ACCOUNTS.login(username, password):
                     cur_user = account_list[username]
-                    main_menu()
+                    main_menu(cur_user)
 
                 else:
                     login_form.error = True
@@ -235,10 +215,12 @@ def login(register: any) -> None:
 
 
 # ====================== Main menu ======================
-def main_menu() -> None:
+def main_menu(cur_user) -> None:
     """Handler function for the main menu/home screen of the app"""
-
-    ui_manager2 = pygame_gui.UIManager((screen.get_width(), screen.get_height()), "theme.json")
+    pygame.font.init()
+    clock = pygame.time.Clock()
+    screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
+    ui_manager = pygame_gui.UIManager((screen.get_width(), screen.get_height()), "theme.json")
     pygame.display.set_caption("Reqtify")
     margin = 20
     error_message = ""
@@ -257,7 +239,7 @@ def main_menu() -> None:
     # ------------------ Construct textbox ------------------
     textbox = TextBox((screen.get_width() / 2 - font.size("Describe")[0] / 2, 500),
                       (font.size("Describe")[0], 50),
-                      ui_manager2,
+                      ui_manager,
                       "user_input",
                       False)
 
@@ -327,15 +309,15 @@ def main_menu() -> None:
             button.draw(screen)
 
         textbox.set_pos((title_x, title_start_height))
-        refresh_rate = CLOCK.tick(60) / 1000
-        ui_manager2.update(refresh_rate)
-        ui_manager2.draw_ui(screen)
+        refresh_rate = clock.tick(60) / 1000
+        ui_manager.update(refresh_rate)
+        ui_manager.draw_ui(screen)
 
         # check for user input
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
-                accounts.save()
+                ACCOUNTS.save()
                 pygame.quit()
                 sys.exit()
 
@@ -356,23 +338,36 @@ def main_menu() -> None:
                             pygame.display.update()
                             delay = random.randint(2500, 3000)
                             pygame.time.delay(delay)
-                            output(user_input)
+                            output(user_input, cur_user)
 
                     if profile_button.check_hover(mouse_pos):
-                        profile()
+                        profile(cur_user)
 
                     if search_button.check_hover(mouse_pos):
-                        search()
+                        search(cur_user)
 
-            ui_manager2.process_events(event)
+            ui_manager.process_events(event)
         pygame.display.update()
 
 
 # ====================== Outputing result from calculation ======================
-def output(user_input):
+def output(user_input, cur_user) -> None:
     """handler function for the choose song page"""
-    global screen
+    # Construct user input parsing tool
+    guesser = MusicFeatureGuesser("reference_data.csv")
+    tolerance = 5
 
+    # Song manager
+    song_manager = SongManager()
+    song_manager.load_data_raw("dataset.csv")
+    song_manager.parse_data()
+
+    # Decision Tree
+    decision_tree = DecisionTree(None, [])
+    decision_tree.build_tree("songs.csv")
+
+    pygame.font.init()
+    screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
     margin = 20
 
     # ---------------Calculate a playlist based on user input---------------
@@ -401,14 +396,11 @@ def output(user_input):
 
     # --------------- initialize text border ---------------
     text_border = pygame.image.load("assets/title_border2.png")
-    text_border = pygame.transform.smoothscale(text_border,
-                                               (
-                                                   text_rect.width + 100,
-                                                   text_border.get_height() *
-                                                   ((text_rect.width + 100) /
-                                                    text_border.width)
-                                                    )
-                                               )
+    text_border = pygame.transform.smoothscale(
+        text_border,
+        (text_rect.width + 100,
+         text_border.get_height() * ((text_rect.width + 100) / text_border.width))
+    )
 
     text_border_rect = text_border.get_rect()
     text_border_rect.center = (text_rect.centerx - 20, text_rect.centery - 3)
@@ -444,7 +436,7 @@ def output(user_input):
     # --------------- Loop ---------------
     while True:
         screen.fill(Settings.BACKGROUND_COLOUR)
-        save_buttons = [display.button for display in playlist.get_displays().values()]
+        save_buttons = [x.button for x in playlist.get_displays().values()]
 
         # get mouse position
         mouse_pos = pygame.mouse.get_pos()
@@ -463,17 +455,17 @@ def output(user_input):
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
-                accounts.save()
+                ACCOUNTS.save()
                 pygame.quit()
                 sys.exit()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if home_button.check_hover(mouse_pos):
-                        main_menu()  # pass user input into a parsing function
+                        main_menu(cur_user)  # pass user input into a parsing function
 
                     if profile_button.check_hover(mouse_pos):
-                        profile()
+                        profile(cur_user)
 
                     if up_button.check_hover(mouse_pos):
                         if list(playlist.get_displays().values())[0].song != song_holder[0]:
@@ -520,9 +512,10 @@ def output(user_input):
 
 
 # ====================== display profile info ======================
-def profile() -> None:
+def profile(cur_user) -> None:
     """Handler function for the profile page"""
-    global screen
+    pygame.font.init()
+    screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
     pygame.display.set_caption("Reqtify")
     margin = 20
 
@@ -534,11 +527,10 @@ def profile() -> None:
     text1_rect = text1.get_rect(center=(screen.get_width() / 2, 60))
     text2_rect = text2.get_rect(center=(screen.get_width() / 2, 125))
     text1_border = pygame.image.load("assets/title_border1.png")
-    text1_border = pygame.transform.smoothscale(text1_border,
-                                                (text1_rect.width + 100,
-                                                 text1_border.get_height() *
-                                                 ((text1_rect.width + 100) /
-                                                  text1_border.width)))
+    text1_border = pygame.transform.smoothscale(
+        text1_border,
+        (text1_rect.width + 100,
+         text1_border.get_height() * ((text1_rect.width + 100) / text1_border.width)))
 
     text1_border_rect = text1_border.get_rect()
     text1_border_rect.center = (text1_rect.centerx, text1_rect.centery - 3)
@@ -579,7 +571,7 @@ def profile() -> None:
         stat_starting_height = 175
         mouse_pos = pygame.mouse.get_pos()
 
-        save_buttons = [display.button for display in cur_user.playlist.get_displays().values()]
+        save_buttons = [x.button for x in cur_user.playlist.get_displays().values()]
 
         for button in buttons:
             button.draw(screen)
@@ -592,7 +584,7 @@ def profile() -> None:
             else:
                 text = font.render(f"{stat}: {stats[stat]}", True, (30, 30, 30))
 
-            text_rect = text.get_rect(topleft=(screen.width/2 + margin * 4, stat_starting_height))
+            text_rect = text.get_rect(topleft=(screen.width / 2 + margin * 4, stat_starting_height))
             stat_starting_height += 80
 
             text_border = pygame.image.load("assets/title_border3.png")
@@ -614,14 +606,14 @@ def profile() -> None:
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
-                accounts.save()
+                ACCOUNTS.save()
                 pygame.quit()
                 sys.exit()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if home_button.check_hover(mouse_pos):
-                        main_menu()
+                        main_menu(cur_user)
 
                     if up_button.check_hover(mouse_pos) and len(cur_user.playlist.get_songs()) > 0:
                         displays = cur_user.playlist.get_displays()
@@ -667,8 +659,11 @@ def profile() -> None:
 
 
 # ====================== search prompt ======================
-def search():
+def search(cur_user) -> None:
     """Handler function for the search page"""
+    pygame.font.init()
+    clock = pygame.time.Clock()
+    screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
     ui_manager3 = pygame_gui.UIManager((screen.get_width(), screen.get_height()), "theme.json")
     pygame.display.set_caption("Reqtify")
     margin = 20
@@ -677,6 +672,9 @@ def search():
     font = pygame.font.SysFont("Georgia", 40)
     font.set_bold(True)
     font2 = pygame.font.SysFont("Georgia", 15)
+
+    # get acocunt_list
+    account_list = ACCOUNTS.get_account()
 
     textbox = TextBox((screen.get_width() / 2 - font.size("compare music")[0] / 2, 360),
                       (font.size("compare music")[0], 50),
@@ -719,7 +717,7 @@ def search():
 
         for line in title:
             text = font.render(line, True, (255, 255, 255))
-            text_rect = text.get_rect(center=(screen.width/2, title_start_height))
+            text_rect = text.get_rect(center=(screen.width / 2, title_start_height))
             title_start_height += text_rect.height
             screen.blit(text, text_rect)
 
@@ -731,7 +729,7 @@ def search():
             button.draw(screen)
 
         textbox.set_pos((title_x, title_start_height))
-        refresh_rate = CLOCK.tick(60) / 1000
+        refresh_rate = clock.tick(60) / 1000
         ui_manager3.update(refresh_rate)
         ui_manager3.draw_ui(screen)
         pygame.display.update()
@@ -741,7 +739,7 @@ def search():
             ui_manager3.process_events(event)
 
             if event.type == pygame.QUIT:
-                accounts.save()
+                ACCOUNTS.save()
                 pygame.quit()
                 sys.exit()
 
@@ -752,24 +750,25 @@ def search():
                     user_input2 = event.text
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    if search_button.check_hover(mouse_pos):
-                        if user_input2 in account_list:
-                            match(account_list[user_input2])  # pass user input into a parsing function
+                if search_button.check_hover(mouse_pos):
+                    if user_input2 in account_list:
+                        match(account_list[user_input2])  # pass user input into a parsing function
 
-                        else:
-                            error_message = "User not found, please try again."
+                    else:
+                        error_message = "User not found, please try again."
 
-                    if profile_button.check_hover(mouse_pos):
-                        profile()
+                if profile_button.check_hover(mouse_pos):
+                    profile(cur_user)
 
-                    if home_button.check_hover(mouse_pos):
-                        main_menu()
+                if home_button.check_hover(mouse_pos):
+                    main_menu(cur_user)
 
 
 # ====================== search result ======================
-def match(other_user):
+def match(other_user, cur_user) -> None:
     """Handler function for the match display page"""
+    pygame.font.init()
+    screen = pygame.display.set_mode((Settings.SCREEN_WIDTH, Settings.SCREEN_HEIGHT))
     pygame.display.set_caption("Reqtify")
     margin = 75
     button_margin = 20
@@ -815,7 +814,7 @@ def match(other_user):
 
         text2 = font2.render(f"{cur_user.name} + {other_user.name}", True, (200, 200, 200))
 
-        text1_rect = text1.get_rect(center=(screen.width/2, screen.height/2))
+        text1_rect = text1.get_rect(center=(screen.width / 2, screen.height / 2))
         text2_rect = text2.get_rect(center=(text1_rect.centerx, text1_rect.y - text1_rect.height))
 
         screen.blit(text1, text1_rect)
@@ -836,7 +835,7 @@ def match(other_user):
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
-                accounts.save()
+                ACCOUNTS.save()
                 pygame.quit()
                 sys.exit()
 
@@ -844,10 +843,14 @@ def match(other_user):
                 if event.button == 1:
 
                     if profile_button.check_hover(mouse_pos):
-                        profile()
+                        profile(cur_user)
 
                     if home_button.check_hover(mouse_pos):
-                        main_menu()
+                        main_menu(cur_user)
 
 
+python_ta.check_all(config={
+    'max-line-length': 120,
+    'disable': ['R1705', 'E9998', 'E9999', 'E1101']
+})
 login_selection()

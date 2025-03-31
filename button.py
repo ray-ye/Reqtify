@@ -61,7 +61,7 @@ class Button():
         self.text_input = text_input
         self.font_size = font_size
         if font:
-            self.font = pygame.font.SysFont(text_input, self.font_size, bold=True)
+            self.font = pygame.font.SysFont(font, self.font_size)
         self.width = button_size[0]
         self.height = button_size[1]
         self.font_colour = font_colour

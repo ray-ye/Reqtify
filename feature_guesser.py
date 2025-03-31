@@ -6,9 +6,9 @@ from sentence_transformers import SentenceTransformer
 
 
 class MusicFeatureGuesser:
-    """A algorithm that looks at sentences and keeps track of features and 
+    """An algorithm that looks at sentences and keeps track of features and
     eventually gets features with similar sentences
-    
+
     Instance Attributes:
     - embedder: transforms sentences
     - features: a list of features
@@ -57,7 +57,7 @@ class MusicFeatureGuesser:
 
     def predict_features(self, user_input: str, tolerance: int = 3):
         """
-        Predicts the music features based on the user input. 
+        Predicts the music features based on the user input.
         A higher tolerance implies a lower threshold for similarity.
 
         Preconditions:
