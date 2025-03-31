@@ -545,7 +545,7 @@ class Accounts:
     def handle_login(self, username: str) -> User | None:
         """
         A function to help manage the prompt message for user account info.
-        Return user oject containing user info
+        Return user object containing user info
         """
 
         return self.get_account()[username]
