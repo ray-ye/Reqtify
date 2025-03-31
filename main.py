@@ -337,8 +337,6 @@ def main_menu(cur_user) -> None:
                         else:
                             screen.blit(text2, text_rect2)
                             pygame.display.update()
-                            delay = random.randint(2500, 3000)
-                            pygame.time.delay(delay)
                             output(user_input, cur_user)
 
                     if profile_button.check_hover(mouse_pos):
