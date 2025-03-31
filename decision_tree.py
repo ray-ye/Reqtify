@@ -1,8 +1,15 @@
+"""This module creates the decision tree used to filter songs."""
 import csv
 from typing import Any, Optional
 
 
 class DecisionTree:
+    """A Decision Tree that filters songs
+
+    Instance Attributes:
+    - _root: the roots of tree:
+    - _subtrees: a list of all subtrees
+    """
     _root: Optional[Any]
     _subtrees: list['DecisionTree']
 
@@ -61,7 +68,7 @@ class DecisionTree:
                 if subtree.__contains__(item):
                     return True
             return False
-    
+
     def insert_sequence(self, items: list) -> None:
         """
         Insert the given sequence of items into this tree.
@@ -112,17 +119,18 @@ class DecisionTree:
 
         with open(file_path, 'r') as file:
             reader = csv.reader(file)
-            data = [list(map(lambda x: x=='True', row[1:])) + [row[0]] for row in reader]
+            data = [list(map(lambda x: x == 'True', rw[1:])) + [rw[0]] for rw in reader]
 
         for row in data:
             self.insert_sequence(row)
-    
+            
 
 if __name__ == '__main__':
-    tree = DecisionTree('', [])
-    tree.build_tree('songs.csv')
-    songs = tree.children([True,False,False,False,True,True,False,True,False,False])
-    print(songs)
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'disable': ['R1705', 'E9998', 'E9999']
+    })
 
     import doctest
     doctest.testmod()

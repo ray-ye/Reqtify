@@ -1,3 +1,4 @@
+"""This module is used to parse data"""
 import csv
 
 rows = []
@@ -13,15 +14,26 @@ with open('dataset.csv', 'r', encoding="utf-8") as file:
             'is_happy': float(row['valence']) > 0.5,
             'is_loud': float(row['loudness']) > -7,  # -7 is the median value
             'is_major': int(row['mode']) == 1,
-            'is_danceable': float(row['danceability']) > 0.6, # 0.6 is roughly the median value
+            'is_danceable': float(row['danceability']) > 0.6,  # 0.6 is roughly the median value
             'is_live': float(row['liveness']) > 0.8,  # 0.8 is described to be high probability of being live
             'is_fast': float(row['tempo']) > 120,  # roughly the median value
         }
         rows.append(row)
 
 with open('songs.csv', 'w', newline='') as file:
-    writer = csv.DictWriter(file, fieldnames=['track_id', 'is_explicit', 'is_energetic', 'is_instrumental', 'is_acoustic', 'is_happy',
-                                              'is_loud', 'is_major', 'is_danceable', 'is_live', 'is_fast'])
+    writer = csv.DictWriter(file, fieldnames=[
+        'track_id', 'is_explicit', 'is_energetic', 'is_instrumental', 'is_acoustic', 'is_happy',
+        'is_loud', 'is_major', 'is_danceable', 'is_live', 'is_fast'
+    ])
     writer.writeheader()
 
     writer.writerows(rows)
+
+
+if __name__ == '__main__':
+
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'disable': ['R1705', 'E9998', 'E9999']
+    })

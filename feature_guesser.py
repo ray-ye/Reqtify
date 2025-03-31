@@ -1,3 +1,4 @@
+"""This module predicts features based on user inputs"""
 import csv
 import torch
 import numpy as np
@@ -5,12 +6,26 @@ from sentence_transformers import SentenceTransformer
 
 
 class MusicFeatureGuesser:
-    # awful class name. can't think of anything better
-    def __init__(self, file_path: str = None):
+    """A algorithm that looks at sentences and keeps track of features and 
+    eventually gets features with similar sentences
+    
+    Instance Attributes:
+    - embedder: transforms sentences
+    - features: a list of features
+    - sentence_music_features: a list of sentence music features
+    - sentence_embeddings: a list of sentence embeddings
+    """
+    embedder: any
+    features: list
+    sentence_music_features: list
+    sentence_embeddings: list
+    sentences: list
+
+    def __init__(self, file_path: str = None) -> None:
         """Initializes the MusicFeatureGuesser class"""
         # algorithm:
         # look at the sentences -> vectorize, keep track of the features for each sentence
-        # uesr input ->
+        # user input ->
         # vectorize ->
         # find similarity with the sentences ->
         # get features that are common with similar sentence
@@ -40,9 +55,11 @@ class MusicFeatureGuesser:
 
         self.sentence_embeddings = self.embedder.encode(self.sentences)
 
-    def predict_features(self, user_input: str, tolerance: int=3):
+    def predict_features(self, user_input: str, tolerance: int = 3):
         """
-        Predicts the music features based on the user input. A higher tolerance implies a lower threshold for similarity.
+        Predicts the music features based on the user input. 
+        A higher tolerance implies a lower threshold for similarity.
+
         Preconditions:
             - tolerance > 0
             - user_input is a non-empty string
@@ -64,16 +81,16 @@ class MusicFeatureGuesser:
 
 if __name__ == '__main__':
     # Example usage
-    file_path = 'reference_data.csv'
-    guesser = MusicFeatureGuesser(file_path)
-    user_input = "Upbeat study music"
-    tolerance = 5
-    features = guesser.predict_features(user_input, tolerance)
-    for feature_name, value in zip(guesser.features, features):
-        print(feature_name, ":", value)
+    # file_path = 'reference_data.csv'
+    # guesser = MusicFeatureGuesser(file_path)
+    # user_input = "Upbeat study music"
+    # tolerance = 5
+    # features = guesser.predict_features(user_input, tolerance)
+    # for feature_name, value in zip(guesser.features, features):
+    #     print(feature_name, ":", value)
 
-    # import python_ta
-    # python_ta.check_all(config={
-    #     'max-line-length': 120,
-    #     'disable': ['R1705', 'E9998', 'E9999']
-    # })
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'disable': ['R1705', 'E9998', 'E9999']
+    })

@@ -67,7 +67,7 @@ big_logo_rect = big_logo.get_rect(center=(screen.get_width() / 2, screen.get_hei
 
 
 # ====================== Login selection ======================
-def login_selection():
+def login_selection() -> None:
     """Handler function for the login screen of the app"""
     global screen
 
@@ -138,8 +138,7 @@ def login_selection():
         pygame.display.update()
 
 
-# ====================== Login form ======================
-def login(register):
+def login(register: any) -> None:
     """Handler function for the login screen"""
     global cur_user
 
@@ -236,7 +235,7 @@ def login(register):
 
 
 # ====================== Main menu ======================
-def main_menu():
+def main_menu() -> None:
     """Handler function for the main menu/home screen of the app"""
 
     ui_manager2 = pygame_gui.UIManager((screen.get_width(), screen.get_height()), "theme.json")
@@ -368,7 +367,7 @@ def main_menu():
             ui_manager2.process_events(event)
         pygame.display.update()
 
-
+        
 # ====================== Outputing result from calculation ======================
 def output(user_input):
     """handler function for the choose song page"""
@@ -405,7 +404,6 @@ def output(user_input):
     text_border = pygame.transform.smoothscale(text_border,
                                                (
                                                    text_rect.width + 100,
-
                                                    text_border.get_height() *
                                                    ((text_rect.width + 100) /
                                                     text_border.width)
@@ -522,7 +520,7 @@ def output(user_input):
 
 
 # ====================== display profile info ======================
-def profile():
+def profile() -> None:
     """Handler function for the profile page"""
     global screen
     pygame.display.set_caption("Reqtify")
@@ -550,9 +548,11 @@ def profile():
                          (margin * 3, margin * 3),
                          (50, 50))
 
-    profile_button = Button("assets/profile.png",
-                            (screen.get_width() - margin * 3, margin * 3),
-                            (50, 50))
+    profile_button = Button(
+        "assets/profile.png",
+        (screen.get_width() - margin * 3, margin * 3),
+        (50, 50)
+    )
 
     up_button = Button("assets/up_button.png",
                        (screen.get_width() / 2 - screen.get_width() / 4 - margin * 1.5, screen.get_height() - 65),

@@ -3,10 +3,10 @@
 from csv import DictReader
 from typing import Optional
 from dataclasses import dataclass
-from button import Button
-import pygame
 import json
+import pygame
 import pyperclip
+from button import Button
 
 
 @dataclass
@@ -29,7 +29,6 @@ class Song:
     - tempo: tempo of the song in BPM
     - track_genre: the genre of the song
     """
-
     track_id: str
     artists: list[str]
     album_name: str
@@ -46,20 +45,30 @@ class Song:
     tempo: float
     track_genre: str
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representation of the song"""
         return f"{self.track_name} by {', '.join(self.artists)}"
 
 
 class Playlist:
-    """This class has-a collection of song objects as well as functions that help compute data of the playlist"""
+    """This class has-a collection of song objects as well as functions that help compute data of the playlist
 
-    def __init__(self, name: str, songs: Optional[dict] = None, ):
+    Instance Attributes:
+    - name: name of playlist
+    - _songs: a list of songs
+    - _display: displays songs
+
+    """
+    name: str
+    _songs: dict
+    _displays: dict
+
+    def __init__(self, name: str, songs: Optional[dict] = None, ) -> None:
         """Initializes a playlist object with a name and an empty list of songs"""
-        self.name: str = name
-        self._songs: dict = songs if songs is not None else {}  # I changed this to a dict mapping id to song object - R
+        self.name = name
+        self._songs = songs if songs is not None else {}  # I changed this to a dict mapping id to song object - R
 
-        self._displays: dict = {}
+        self._displays = {}
 
     def __len__(self) -> int:
         """Return the number of songs in the playlist"""
@@ -69,7 +78,7 @@ class Playlist:
         """Add a song to the playlist"""
         self._songs[song.track_id] = song
 
-    def remove_song(self, song) -> None:
+    def remove_song(self, song: Song) -> None:
         """Remove a song from the playlist"""
         del self._songs[song.track_id]
 
@@ -164,11 +173,9 @@ class Playlist:
                 genre_count[genre] = 0
             genre_count[genre] += 1
 
-        top_genre = None
         max_count = 0
         for genre, count in genre_count.items():
             if count > max_count:
-                top_genre = genre
                 max_count = count
 
         return genre
@@ -176,8 +183,7 @@ class Playlist:
     def _vectorize_song(self, song: Song) -> list[float]:
         """Return a list of the features of the song, normalized to a value roughly between 0 and 1"""
         return [song.energy, song.mode, song.speechiness, song.acousticness,
-                song.instrumentalness, song.valence, song.tempo / 120
-        ]
+                song.instrumentalness, song.valence, song.tempo / 120]
 
     def _vectorize_playlist(self) -> list[float]:
         """
@@ -211,7 +217,8 @@ class Playlist:
 
         return dot_product / (norm1 * norm2)
 
-    def load_displays(self, screen, start_height, songs: list[Song], profile: Optional[bool] = None) -> None:
+    def load_displays(self, screen: any, start_height: int, songs: list[Song], profile: Optional[bool] = None) -> None:
+        """Loads the displays"""
         self._displays = {}
         margin = 15
         button_margin = 25
@@ -244,8 +251,8 @@ class Playlist:
 
             self._displays[songs[i].track_id] = Display(pos, rect_dimensions, songs[i], save_button)
 
-
-    def update_display(self, user):
+    def update_display(self, user: any) -> None:
+        """Updates the displays"""
         for display in self._displays:
             if display in user.playlist.get_songs():
                 self._displays[display].button.image = pygame.image.load("assets/heart.png").convert_alpha()
@@ -254,24 +261,38 @@ class Playlist:
                 self._displays[display].button.image = pygame.image.load("assets/unheart.png").convert_alpha()
                 self._displays[display].button.update_image()
 
-
-    def draw(self, screen) -> None:
+    def draw(self, screen: any) -> None:
+        """Draws the displays"""
         for display in self._displays.values():
             display.draw(screen)
 
     def get_displays(self) -> dict:
+        """Returns displays"""
         return self._displays
 
 
 class Display():
+    """A data class that displays anything necessary 
 
-    def __init__(self, pos, dimension, song: Song, save_button):
+    Instance Attributes:
+    - pos: position of  display
+    - dimension: dimension of display
+    - song: the songs being displayed
+    - button: buttons used in display
+    """
+    pos: tuple
+    dimension: tuple
+    song: Song
+    button: any
+
+    def __init__(self, pos: tuple, dimension: tuple, song: Song, save_button: any) -> None:
         self.pos = pos
         self.dimension = dimension
         self.song = song
         self.button = save_button
 
-    def draw(self, screen):
+    def draw(self, screen: any) -> None:
+        """Draws onto the menu"""
         margin = 25
         font_size1 = 20
         font_size2 = 12
@@ -293,7 +314,9 @@ class Display():
         else:
             song_name = self.song.track_name
 
-        while font1.size(song_name)[0] > self.dimension[0] - save_button_size - album_cover_size - margin * 2:
+        while (font1.size(song_name)[0] > 
+               self.dimension[0] - save_button_size - album_cover_size - margin * 2
+        ):
             font_size1 -= 1
             font1 = pygame.font.SysFont("Arial", font_size1, bold=True)
 
@@ -310,7 +333,12 @@ class Display():
         text1 = font1.render(song_name, True, (30, 30, 30))
         text2 = font2.render(artists, True, (30, 30, 30))
 
-        text1_rect = text1.get_rect(topleft=(album_cover.get_pos()[0] + album_cover_size / 2 + margin - 15, self.pos[1] + margin - 12))
+        text1_rect = text1.get_rect(
+            topleft=(
+                album_cover.get_pos()[0] + album_cover_size / 2 + margin - 15,
+                self.pos[1] + margin - 12
+            )
+        )
         text2_rect = text2.get_rect(topleft=(text1_rect.x, text1_rect.y + text1.get_height()))
 
         pygame.draw.rect(screen, "white", rect, border_radius=3)
@@ -319,30 +347,37 @@ class Display():
         screen.blit(text1, text1_rect)
         screen.blit(text2, text2_rect)
 
-    def set_pos(self, pos):
+    def set_pos(self, pos: tuple) -> None:
+        """Sets the potition"""
         self.pos = pos
 
 
 class SongManager:
-    """Class to load, parse, and manage the song data"""
+    """Class to load, parse, and manage the song data
 
-    def __init__(self, file_path: Optional[str] = None):
+    Instance Attributes:
+    - 
+    """
+    _song_data_raw: list[dict[str, str]]
+    _songs: dict[str, Song]
+
+    def __init__(self, file_path: Optional[str] = None) -> None:
         """"""
-        self._song_data_raw: list[dict[str, str]] = []
-        self._songs: dict[str, Song] = {}
+        self._song_data_raw = []
+        self._songs = {}
 
         if file_path is not None:
             self.load_data_raw(file_path)
             self.parse_data()
 
-    def load_data_raw(self, file_path: str):
+    def load_data_raw(self, file_path: str) -> None:
         """Loads the raw song data from a CSV file into the _song_data_raw attribute"""
         with open(file_path, 'r', encoding="utf-8") as file:
             csv_reader = DictReader(file)
             for row in csv_reader:
                 self._song_data_raw.append(row)
 
-    def parse_data(self):
+    def parse_data(self) -> None:
         """Parse the raw song data into Song objects and store them in the songs attribute"""
         for row in self._song_data_raw:
             track_id = row['track_id']
@@ -445,7 +480,7 @@ class Accounts:
         """Return a set of all usernames"""
         return set(self._accounts.keys())
 
-    def exist(self, username) -> bool:
+    def exist(self, username: str) -> bool:
         """Check if user exists via their username"""
         return username in self.get_all_name()
 
@@ -473,7 +508,7 @@ class Accounts:
         with open("account_data.json", "w") as f:
             json.dump(account_data, f, indent=2)
 
-    def save(self):
+    def save(self) -> None:
         """Saves account data into account database"""
         account_data = {}
 
@@ -488,13 +523,13 @@ class Accounts:
 
             json.dump(account_data, f, indent=2)
 
-    def handle_login(self, username) -> User | None:
+    def handle_login(self, username: str) -> User | None:
         """A function to help manage the prompt message for user account info，
         Return user oject containing user info"""
 
         return self.get_account()[username]
 
-    def error(self, username, password, re_password, get_message: Optional[bool] = None) -> bool | str:
+    def error(self, username: str, password: str, re_password: str, get_message: Optional[bool] = None) -> bool | str:
         """Return whether error has occured, and if get_message, return the error message."""
 
         error_message = ""
@@ -545,7 +580,6 @@ if __name__ == '__main__':
     playlist2.add_song(sm.get_song_by_id('6twCOHBycvvQFXJl4CrbvZ'))
     playlist1.copy_to_clipboard()
 
-    print(playlist1.taste_match(playlist2))
     # When you are ready to check your work with python_ta, uncomment the following lines.
     # (Delete the "#" and space before each line.)
     # IMPORTANT: keep this code indented inside the "if __name__ == '__main__'" block
