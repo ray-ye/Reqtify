@@ -1,9 +1,14 @@
+"""
+Main script for the project.
+
+This script initializes and runs the application.
+"""
 from __future__ import annotations
 import json
-import pygame
-import pygame_gui
 import sys
 from typing import Optional
+import pygame
+import pygame_gui
 
 
 from settings import Settings
@@ -48,7 +53,7 @@ playlist1.add_song(data_manager.get_song_by_id('6lfxq3CG4xtTiEg7opyCyx'))
 
 
 # main menu
-def login_selection():
+def login_selection() -> None:
     """Handler function for the login screen of the app"""
     global screen
 
@@ -124,7 +129,7 @@ def login_selection():
         pygame.display.update()
 
 
-def login(register):
+def login(register: any) -> None:
     """Handler function for the login screen"""
     username = ""
     password = ""
@@ -152,7 +157,7 @@ def login(register):
 
     while True:
         screen.fill(Settings.BACKGROUND_COLOUR)
-        refresh_rate = CLOCK.tick(60)/1000
+        refresh_rate = CLOCK.tick(60) / 1000
         mouse_pos = pygame.mouse.get_pos()
         hover_effect(mouse_pos, [login_form.button])
         login_form.draw(screen)
@@ -204,7 +209,7 @@ def login(register):
         pygame.display.update()
 
 
-def main_menu():
+def main_menu() -> None:
     """Handler function for the main menu/home screen of the app"""
     ui_manager2 = pygame_gui.UIManager((screen.get_width(), screen.get_height()), "theme.json")
     pygame.display.set_caption("Reqtify")
@@ -289,37 +294,41 @@ def main_menu():
             ui_manager2.process_events(event)
 
 
-def search():
+def search() -> None:
     """Handler function for the search page"""
     pass
 
 
-def match():
+def match() -> None:
     """Handler function for the match display page"""
     pass
 
 
-def profile():
+def profile() -> None:
     """Handler function for the profile page"""
     global screen
     pygame.display.set_caption("Reqtify")
     margin = 20
 
-    home_button = Button("assets/home.png",
-                           (margin * 3, margin * 3),
-                           (50, 50))
+    home_button = Button("assets/home.png", (margin * 3, margin * 3), (50, 50))
 
-    profile_button = Button("assets/profile.png",
-                            (screen.get_width() - margin * 3, margin * 3),
-                            (50, 50))
+    profile_button = Button(
+        "assets/profile.png",
+        (screen.get_width() - margin * 3, margin * 3),
+        (50, 50)
+    )
 
-    up_button = Button("assets/up_button.png",
-                            (screen.get_width() / 2 - margin * 1.5, screen.get_height() - 65),
-                            (50, 50))
+    up_button = Button(
+        "assets/up_button.png",
+        (screen.get_width() / 2 - margin * 1.5, screen.get_height() - 65),
+        (50, 50)
+    )
 
-    down_button = Button("assets/down_button.png",
-                            (screen.get_width() / 2 + margin * 1.5, screen.get_height() - 65),
-                            (50, 50))
+    down_button = Button(
+        "assets/down_button.png",
+        (screen.get_width() / 2 + margin * 1.5, screen.get_height() - 65),
+        (50, 50)
+    )
 
     cur_user.playlist.load_displays(screen, 150, list(cur_user.playlist.get_songs().values()))
     cur_user.playlist.update_display(cur_user)
@@ -327,7 +336,6 @@ def profile():
 
     song_holder = list(cur_user.playlist.get_songs().values())
     buttons = [home_button, profile_button, up_button, down_button]
-
 
     while True:
         screen.fill(Settings.BACKGROUND_COLOUR)
@@ -388,13 +396,17 @@ def profile():
                         print(cur_user.playlist.get_displays())
 
 
-
-
-
-
 def ouptut():
     """handler function for the choose song page"""
     pass
 
+
+if __name__ == '__main__':
+
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'disable': ['R1705', 'E9998', 'E9999']
+    })
 
 profile()
