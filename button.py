@@ -3,7 +3,7 @@ from typing import Optional
 import pygame
 
 
-def hover_effect(position: tuple[int, int], buttons: bool) -> None:
+def hover_effect(position: tuple[int, int], buttons: list[Button]) -> None:
     """Check if user is hovering over button and change the button accordingly."""
 
     if any(button.check_hover(position) for button in buttons if button):
