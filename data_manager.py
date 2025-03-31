@@ -127,8 +127,18 @@ class Playlist:
         return [x[0] for x in recommended_songs[:limit]]
 
     def playlist_profile(self):
-        """Return a dictionary with the 'profile' of the playlist, containing the top genre, average moods, etc.
-        (in percentage)"""
+        """
+        Return a dictionary with the 'profile' of the playlist, containing the top genre, average moods, etc.
+        (in percentage).
+        """
+        if len(self._songs) == 0:
+            return {
+                'Top genre': '[Empty]',
+                'Avg energy': 0,
+                'Avg acousticness': 0,
+                'Avg instrumentalness': 0,
+                'Avg happiness': 0
+            }
         top_genre = self._top_genre()
         avg_energy, _, _, avg_acousticness, avg_instrumentalness, avg_valence, _ = self._vectorize_playlist()
 
@@ -456,7 +466,9 @@ class Accounts:
 
         for account in self._accounts:
             data = self._accounts[account]
-            account_data[account] = {"password": data.password, "playlist": []}
+            account_data[account] = {"password": data.password,
+                                     "playlist": [song.track_id for song in
+                                                  self._accounts[account].playlist.get_songs().values()]}
 
         with open("account_data.json", "w") as f:
             json.dump(account_data, f, indent=2)
@@ -467,12 +479,14 @@ class Accounts:
 
         with open("account_data.json", "w") as f:
             for username in self._accounts:
+                print(username + "playlist:", self._accounts[username])
                 account_data[username] = {"password": self._accounts[username].password,
                                           "playlist":
-                                              [song.track_id for song in self._accounts[username].playlist.get_songs()]
+                                              [song.track_id for song in
+                                               self._accounts[username].playlist.get_songs().values()]
                                           }
 
-            json.dump(self._accounts, f, indent=2)
+            json.dump(account_data, f, indent=2)
 
     def handle_login(self, username) -> User | None:
         """A function to help manage the prompt message for user account info，

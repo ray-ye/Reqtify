@@ -10,16 +10,19 @@ class MusicFeatureGuesser:
         """Initializes the MusicFeatureGuesser class"""
         # algorithm:
         # look at the sentences -> vectorize, keep track of the features for each sentence
-        # uesr input -> vectorize -> find similarity with the sentences -> get features that are common with similar sentences
+        # uesr input ->
+        # vectorize ->
+        # find similarity with the sentences ->
+        # get features that are common with similar sentence
         # return the boolean values for the features
         self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
-        self.features = []  
-        self.sentence_music_features = [] 
+        self.features = []
+        self.sentence_music_features = []
         self.sentence_embeddings = []
 
         if file_path is not None:
             self.load_data(file_path)
-                
+
     def load_data(self, file_path: str):
         """Loads the data from the CSV file"""
         with open(file_path, 'r', encoding="utf-8") as file:
@@ -33,7 +36,7 @@ class MusicFeatureGuesser:
             for row in reader:
                 self.sentences.append(row['sentence'])
                 music_features = np.array([float(row[feature]) for feature in self.features])
-                self.sentence_music_features.append(music_features) 
+                self.sentence_music_features.append(music_features)
 
         self.sentence_embeddings = self.embedder.encode(self.sentences)
 
@@ -50,12 +53,12 @@ class MusicFeatureGuesser:
 
         # Get indices of top k most similar sentences
         indices = torch.topk(similarities, k=tolerance)[1]
-        
+
         # Get the 'normal' music features of the most similar sentences
         avg = np.mean([self.sentence_music_features[idx] for idx in indices], axis=0)
         avg = np.round(avg).astype(int)
         features = avg.tolist()
-        
+
         return features
 
 
