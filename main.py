@@ -26,7 +26,7 @@ from settings import Settings
 from button import Button, hover_effect
 from textbox import TextBox
 from form_generator import Form
-from data_manager import Playlist, Song, User, Accounts, SongManager
+from data_manager import Playlist, Accounts, SongManager
 from feature_guesser import MusicFeatureGuesser
 from decision_tree import DecisionTree
 
@@ -367,7 +367,7 @@ def main_menu() -> None:
             ui_manager2.process_events(event)
         pygame.display.update()
 
-        
+
 # ====================== Outputing result from calculation ======================
 def output(user_input):
     """handler function for the choose song page"""

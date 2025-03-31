@@ -45,7 +45,7 @@ class Button():
     text_rect: any
     rect: any
 
-    def __init__(self, image: any, pos: tuple[int, int], button_size: tuple[int, int],
+    def __init__(self, image: any, pos: tuple[float, float], button_size: tuple[float, float],
                  text_input: Optional[str] = None,
                  font: Optional[str] = None,
                  font_size: Optional[int] = None,
