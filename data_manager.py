@@ -466,7 +466,9 @@ class Accounts:
 
         for account in self._accounts:
             data = self._accounts[account]
-            account_data[account] = {"password": data.password, "playlist": []}
+            account_data[account] = {"password": data.password,
+                                     "playlist": [song.track_id for song in
+                                                  self._accounts[account].playlist.get_songs().values()]}
 
         with open("account_data.json", "w") as f:
             json.dump(account_data, f, indent=2)
@@ -477,12 +479,14 @@ class Accounts:
 
         with open("account_data.json", "w") as f:
             for username in self._accounts:
+                print(username + "playlist:", self._accounts[username])
                 account_data[username] = {"password": self._accounts[username].password,
                                           "playlist":
-                                              [song.track_id for song in self._accounts[username].playlist.get_songs()]
+                                              [song.track_id for song in
+                                               self._accounts[username].playlist.get_songs().values()]
                                           }
 
-            json.dump(self._accounts, f, indent=2)
+            json.dump(account_data, f, indent=2)
 
     def handle_login(self, username) -> User | None:
         """A function to help manage the prompt message for user account info，
