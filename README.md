@@ -17,7 +17,7 @@ Reqtify is an Object-Oriented Python music recommendation engine that curates th
 
 | Results Page | User Profile & Stats |
 | :---: | :---: |
-| ![Results](results_page.jpg) | ![Profile](profile.jpg) |
+| ![Results](results_page.png) | ![Profile](profile.png) |
 
 | Friend Search | Compatibility Match |
 | :---: | :---: |
