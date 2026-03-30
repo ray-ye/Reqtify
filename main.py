@@ -1,4 +1,4 @@
-"""CSC111 Project 2: Reqtify Main
+"""Reqtify Main
 
 This is where modules are utilizaed and pygame graphics are drawn. Each screen of the app has been broken into a
 respective handler function.
